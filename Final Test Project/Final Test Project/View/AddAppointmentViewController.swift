@@ -108,7 +108,7 @@ class AddAppointmentViewController: UIViewController {
 
             alert.addAction(UIAlertAction(
                 title: "\(isSelected ? "✓ " : "")\(service.title)",
-                style: .default,
+                style: .default,   
                 handler: { [weak self] _ in
                     guard let self = self else { return }
 

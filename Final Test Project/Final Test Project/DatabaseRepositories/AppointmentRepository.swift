@@ -21,6 +21,7 @@ protocol AppointmentRepositoryProtocol {
     func fetchAppointments() async throws -> [Appointmemts]
     func deleteAppointment(_ appointment: Appointmemts) async throws
     func fetchAppointmentModels() async throws -> [AppointmentModel]
+    func fetchAppointmentEntity(by id: UUID) async throws -> Appointmemts
 }
 
 // MARK: - Concrete Implementation
@@ -99,4 +100,16 @@ final class DefaultAppointmentRepository: AppointmentRepositoryProtocol {
             }
         }
     }
+    
+    func fetchAppointmentEntity(by id: UUID) async throws -> Appointmemts {
+        return try await context.perform {
+            let request: NSFetchRequest<Appointmemts> = Appointmemts.fetchRequest()
+            request.predicate = NSPredicate(format: "id == %@", id as CVarArg)
+            request.fetchLimit = 1
+            
+            let results = try self.context.fetch(request)
+            return results.first!
+        }
+    }
+
 }

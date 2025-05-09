@@ -100,4 +100,16 @@ final class DefaultViewModel: ObservableObject {
             return matchesDate && matchesEmployee
         }
     }
+    
+    func fetchAppointmentById(by id: UUID) async -> Appointmemts? {
+        do {
+            let appointment = try await repository.fetchAppointmentEntity(by: id)
+            return appointment
+        } catch {
+            print("❌ Failed to fetch appointment with ID \(id):", error)
+            return nil
+        }
+    }
+
+
 }

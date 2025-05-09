@@ -66,7 +66,9 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let selectedEmployee = viewModel.employees[indexPath.row]
-
+        if let selectedCell = collectionView.cellForItem(at: indexPath) as? EmployeeSelectionCollectionViewCell {
+            selectedCell.contentView.backgroundColor = UIColor(named: "appColor")
+        }
         if selectedEmployee.name == "All" {
             viewModel.selectedEmployeeId = nil
         } else {
@@ -74,6 +76,14 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource {
         }
         tableView.reloadData()
     }
+    
+    func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
+        if let deselectedCell = collectionView.cellForItem(at: indexPath) as? EmployeeSelectionCollectionViewCell {
+            deselectedCell.contentView.backgroundColor = UIColor.clear
+        }
+    }
+
+
 }
 
 
@@ -118,6 +128,7 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
          let formattedStartTime = dateFormatter.string(from: appointment.startTime)
          cell.timeLabelTableViewCell.text = formattedStartTime
          
+         cell.delegate = self
          return cell
      }
 
@@ -137,6 +148,35 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
                 }
             }
         }
+    }
+}
+
+// MARK: - AppointmentCardCellDelegate
+extension ViewController: AppointmentCardCellDelegate {
+
+    func didTapEdit(on cell: AppointmentCardTableViewCell) {
+        guard let indexPath = tableView.indexPath(for: cell) else { return }
+        let appointment = viewModel.appointments[indexPath.section]
+        // Implement edit logic if needed
+        print("Edit tapped for appointment: \(appointment.clientName)")
+    }
+
+    func didTapDelete(on cell: AppointmentCardTableViewCell) {
+        guard let indexPath = tableView.indexPath(for: cell) else { return }
+        let appointment = viewModel.appointments[indexPath.section]
+
+        let alert = UIAlertController(title: "Confirm Deletion",
+                                      message: "Are you sure you want to delete this appointment?",
+                                      preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        alert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { _ in
+            Task {
+                    let appointmentEntity = try await self.viewModel.fetchAppointmentById(by: appointment.id)
+                    await self.viewModel.deleteAppointment(appointmentEntity!)
+                    self.tableView.reloadData()
+            }
+        }))
+        present(alert, animated: true)
     }
 }
 
