@@ -7,12 +7,11 @@
 
 import UIKit
 
+// MARK: - AppointmentCardCellDelegate
 protocol AppointmentCardCellDelegate: AnyObject {
     func didTapEdit(on cell: AppointmentCardTableViewCell)
     func didTapDelete(on cell: AppointmentCardTableViewCell)
 }
-
-
 
 class AppointmentCardTableViewCell: UITableViewCell {
 
@@ -40,7 +39,6 @@ class AppointmentCardTableViewCell: UITableViewCell {
 
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
-
     }
     
     private func setupMenu() {
@@ -59,8 +57,6 @@ class AppointmentCardTableViewCell: UITableViewCell {
         optionsButton.menu = menu
         optionsButton.showsMenuAsPrimaryAction = true
     }
-
-    
     
     @IBAction func onOptionsButtonPressed(_ sender: UIButton) {
     }

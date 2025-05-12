@@ -24,6 +24,7 @@ struct EmployeeModel: Identifiable {
 struct AppointmentModel: Identifiable {
     var id: UUID
     var clientName: String
+    var appointmentDate: Date?
     var startTime: Date
     var endTime: Date
     var employee: EmployeeModel

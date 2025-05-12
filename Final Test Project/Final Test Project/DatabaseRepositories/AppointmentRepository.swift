@@ -12,6 +12,7 @@ import CoreData
 protocol AppointmentRepositoryProtocol {
     func createAppointment(
         clientName: String,
+        appointmentDate: Date,
         startTime: Date,
         endTime: Date,
         employee: Employees,
@@ -22,6 +23,7 @@ protocol AppointmentRepositoryProtocol {
     func deleteAppointment(_ appointment: Appointmemts) async throws
     func fetchAppointmentModels() async throws -> [AppointmentModel]
     func fetchAppointmentEntity(by id: UUID) async throws -> Appointmemts
+    func hasConflict(for employee: Employees, on date: Date, startTime: Date, endTime: Date) async throws -> Bool
 }
 
 // MARK: - Concrete Implementation
@@ -35,6 +37,7 @@ final class DefaultAppointmentRepository: AppointmentRepositoryProtocol {
 
     func createAppointment(
         clientName: String,
+        appointmentDate: Date,
         startTime: Date,
         endTime: Date,
         employee: Employees,
@@ -44,6 +47,7 @@ final class DefaultAppointmentRepository: AppointmentRepositoryProtocol {
             let appointment = Appointmemts(context: self.context)
             appointment.id = UUID()
             appointment.clientName = clientName
+            appointment.appointmentDate = appointmentDate
             appointment.startTime = startTime
             appointment.endTime = endTime
             appointment.employee = employee
@@ -74,6 +78,7 @@ final class DefaultAppointmentRepository: AppointmentRepositoryProtocol {
 
             return coreDataAppointments.compactMap { appointment in
                 guard let clientName = appointment.clientName,
+                      let appointmentDate = appointment.appointmentDate,
                       let startTime = appointment.startTime,
                       let endTime = appointment.endTime,
                       let employeeCore = appointment.employee,
@@ -92,6 +97,7 @@ final class DefaultAppointmentRepository: AppointmentRepositoryProtocol {
                 return AppointmentModel(
                     id: appointment.id ?? UUID(),
                     clientName: clientName,
+                    appointmentDate: appointmentDate,
                     startTime: startTime,
                     endTime: endTime,
                     employee: employeeModel,
@@ -100,6 +106,7 @@ final class DefaultAppointmentRepository: AppointmentRepositoryProtocol {
             }
         }
     }
+
     
     func fetchAppointmentEntity(by id: UUID) async throws -> Appointmemts {
         return try await context.perform {
@@ -111,5 +118,26 @@ final class DefaultAppointmentRepository: AppointmentRepositoryProtocol {
             return results.first!
         }
     }
+    
+    
+    func hasConflict(for employee: Employees, on date: Date, startTime: Date, endTime: Date) async throws -> Bool {
+        return try await context.perform {
+            let request: NSFetchRequest<Appointmemts> = Appointmemts.fetchRequest()
+
+            let calendar = Calendar.current
+            let startOfDay = calendar.startOfDay(for: date)
+            let endOfDay = calendar.date(byAdding: .day, value: 1, to: startOfDay)!
+
+            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+                NSPredicate(format: "employee == %@", employee),
+                NSPredicate(format: "appointmentDate >= %@ AND appointmentDate < %@", startOfDay as NSDate, endOfDay as NSDate),
+                NSPredicate(format: "(startTime < %@ AND endTime > %@)", endTime as NSDate, startTime as NSDate)
+            ])
+
+            let conflicts = try self.context.fetch(request)
+            return !conflicts.isEmpty
+        }
+    }
+
 
 }

@@ -1,14 +1,20 @@
 import UIKit
 
+// MARK: - AddAppointmentDelegate
+protocol AddAppointmentDelegate: AnyObject {
+    func didAddAppointment()
+}
+
 class AddAppointmentViewController: UIViewController {
 
     // MARK: - Outlets
     @IBOutlet weak var clientNameTextView: UITextField!
+    @IBOutlet weak var appointmentDateTextView: UITextField!
     @IBOutlet weak var startTimeTextView: UITextField!
     @IBOutlet weak var endTimeTextView: UITextField!
     @IBOutlet weak var selectEmployeeTextView: UITextField!
     @IBOutlet weak var selectServicesTextView: UITextField!
-
+    
     // MARK: - Properties
     private var viewModel: DefaultViewModel!
     private var employeePickerView = UIPickerView()
@@ -18,17 +24,19 @@ class AddAppointmentViewController: UIViewController {
 
     private var filteredEmployees: [EmployeeModel] {
            return Array(viewModel.employees.dropFirst())
-       }
-
+    }
     
-    private let startDatePicker = UIDatePicker()
-    private let endDatePicker = UIDatePicker()
+    weak var delegate: AddAppointmentDelegate?
+    
+    private let datePicker = UIDatePicker()
+    private let startTimePicker = UIDatePicker()
+    private let endTimePicker = UIDatePicker()
 
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
         self.viewModel = AppEnvironment.shared.viewModel
+        NotificationCenter.default.addObserver(self, selector: #selector(showConflictAlert), name: NSNotification.Name("AppointmentConflict"), object: nil)
         
         Task {
             await viewModel.loadEmployees()
@@ -38,49 +46,69 @@ class AddAppointmentViewController: UIViewController {
     }
     
     // MARK: - Date Picker Setup
-       private func setupDatePickers() {
-           // Configure the startDatePicker
-           let now = Date()
-           
-           startDatePicker.datePickerMode = .dateAndTime
-           startDatePicker.preferredDatePickerStyle = .wheels
-           startDatePicker.minuteInterval = 10
-           startDatePicker.minimumDate = now
-           startDatePicker.addTarget(self, action: #selector(startDateChanged), for: .valueChanged)
-           startTimeTextView.inputView = startDatePicker
+    private func setupDatePickers() {
+        let now = Date()
+        
+        // Date Picker to select date only
+        datePicker.datePickerMode = .date
+        datePicker.preferredDatePickerStyle = .wheels
+        datePicker.date = now
+        datePicker.minimumDate = now
+        datePicker.addTarget(self, action: #selector(appointmentDateChanged), for: .valueChanged)
+        appointmentDateTextView.inputView = datePicker
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .medium
+        appointmentDateTextView.text = dateFormatter.string(from: now)
+        
+        // Configure the startTimePicker (for time only)
+        startTimePicker.datePickerMode = .time
+        startTimePicker.preferredDatePickerStyle = .wheels
+        startTimePicker.minuteInterval = 5
+        startTimePicker.date = now
+        startTimePicker.addTarget(self, action: #selector(startDateChanged), for: .valueChanged)
+        startTimeTextView.inputView = startTimePicker
 
-           // Configure the endDatePicker
-           endDatePicker.datePickerMode = .dateAndTime
-           endDatePicker.preferredDatePickerStyle = .wheels
-           endDatePicker.minuteInterval = 10
-           endDatePicker.minimumDate = now
-           endDatePicker.addTarget(self, action: #selector(endDateChanged), for: .valueChanged)
-           endTimeTextView.inputView = endDatePicker
-       }
+        // Configure the endTimePicker (for time only)
+        endTimePicker.datePickerMode = .time
+        endTimePicker.preferredDatePickerStyle = .wheels
+        endTimePicker.minuteInterval = 5
+        endTimePicker.date = Calendar.current.date(byAdding: .minute, value: 5, to: now)!
+        endTimePicker.addTarget(self, action: #selector(endDateChanged), for: .valueChanged)
+        endTimeTextView.inputView = endTimePicker
+    }
 
-       // MARK: - Date Picker Value Changed
-       @objc private func startDateChanged() {
-           let formatter = DateFormatter()
-           formatter.dateStyle = .short
-           formatter.timeStyle = .short
-           startTimeTextView.text = formatter.string(from: startDatePicker.date)
-       }
+    // MARK: - Date Picker Value Changed
+    @objc private func appointmentDateChanged() {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        appointmentDateTextView.text = formatter.string(from: datePicker.date)
+    }
 
-       @objc private func endDateChanged() {
-           let formatter = DateFormatter()
-           formatter.dateStyle = .short
-           formatter.timeStyle = .short
-           
-           // Check if the selected end time is earlier than the start time
-           if endDatePicker.date < startDatePicker.date {
-               // If the end time is invalid (before the start time), show an alert and reset the end time
-               showAlert(message: "End time cannot be earlier than the start time.")
-               endTimeTextView.text = "" // Reset the end time
-               return
-           }
-           
-           endTimeTextView.text = formatter.string(from: endDatePicker.date)
-       }
+    @objc private func startDateChanged() {
+        let formatter = DateFormatter()
+        formatter.timeStyle = .short
+        let selectedStartTime = startTimePicker.date
+        startTimeTextView.text = formatter.string(from: selectedStartTime)
+        
+        let minEndTime = Calendar.current.date(byAdding: .minute, value: 5, to: selectedStartTime)!
+        endTimePicker.minimumDate = minEndTime
+        endTimePicker.date = minEndTime
+        endTimeTextView.text = formatter.string(from: minEndTime)
+    }
+
+    @objc private func endDateChanged() {
+        let formatter = DateFormatter()
+        formatter.timeStyle = .short
+        
+        if endTimePicker.date < startTimePicker.date {
+            showAlert(message: "End time cannot be earlier than the start time.")
+            endTimeTextView.text = ""
+            return
+        }
+        endTimeTextView.text = formatter.string(from: endTimePicker.date)
+    }
+
 
     // MARK: - Picker Setup
     private func setupPickers() {
@@ -111,7 +139,7 @@ class AddAppointmentViewController: UIViewController {
                 style: .default,   
                 handler: { [weak self] _ in
                     guard let self = self else { return }
-
+                    
                     if let index = self.selectedServices.firstIndex(where: { $0.id == service.id }) {
                         self.selectedServices.remove(at: index)
                     } else {
@@ -137,6 +165,12 @@ class AddAppointmentViewController: UIViewController {
         viewModel.selectedEmployeeId = nil
     }
     
+    @IBAction func backButtonPressed(_ sender: UIButton) {
+        viewModel.selectedEmployeeId = nil
+        self.dismiss(animated: true)
+    }
+    
+    
     // MARK: - Action on Creating appointment
     @IBAction func onCreateAppointmentButtonPressed(_ sender: UIButton) {
         guard
@@ -147,20 +181,21 @@ class AddAppointmentViewController: UIViewController {
             showAlert(message: "Please fill all fields and select at least one service.")
             return
         }
-
-        let start = startDatePicker.date
-        let end = endDatePicker.date
+        
+        let appointmentDate = datePicker.date
+        let start = startTimePicker.date
+        let end = endTimePicker.date
 
         Task {
             do {
                 let employeeEntity = try await viewModel.fetchEmployeeEntity(by: employee.id)
                 let serviceEntities = try await viewModel.fetchServiceEntities(by: selectedServices.map { $0.id })
 
-                await viewModel.createAppointment(clientName: clientName, startTime: start, endTime: end, employee: employeeEntity, services: serviceEntities)
-
+                await viewModel.createAppointment(clientName: clientName,appointmentDate: appointmentDate ,startTime: start, endTime: end, employee: employeeEntity, services: serviceEntities)
                 await MainActor.run {
                     let alert = UIAlertController(title: "Success", message: "Appointment added successfully.", preferredStyle: .alert)
                     alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in
+                        self.delegate?.didAddAppointment()
                         self.dismiss(animated: true)
                     }))
                     present(alert, animated: true)
@@ -172,6 +207,10 @@ class AddAppointmentViewController: UIViewController {
                 }
             }
         }
+    }
+    
+    @objc private func showConflictAlert() {
+        showAlert(message: "This employee already has an appointment during this time.")
     }
 }
 
@@ -204,5 +243,4 @@ extension AddAppointmentViewController: UIPickerViewDelegate, UIPickerViewDataSo
         }
         selectEmployeeTextView.resignFirstResponder()
     }
-
 }

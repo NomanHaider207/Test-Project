@@ -3,12 +3,12 @@ import Foundation
 @MainActor
 final class DefaultViewModel: ObservableObject {
     
-    private let repository: AppointmentRepositoryProtocol
+    private let appointmentRepository: AppointmentRepositoryProtocol
     private let employeesRepository: EmployeeRepositoryProtocol
     private let servicesRepository: ServiceRepositoryProtocol
 
     @Published private(set) var appointments: [AppointmentModel] = []
-    @Published private(set) var allAppointments: [AppointmentModel] = []
+    private(set) var allAppointments: [AppointmentModel] = []
     @Published private(set) var employees: [EmployeeModel] = []
 
     @Published var selectedDate: Date = Date() {
@@ -24,7 +24,7 @@ final class DefaultViewModel: ObservableObject {
     }
 
     init(repository: AppointmentRepositoryProtocol, employeesRepository: EmployeeRepositoryProtocol, servicesRepository: ServiceRepositoryProtocol) {
-        self.repository = repository
+        self.appointmentRepository = repository
         self.employeesRepository = employeesRepository
         self.servicesRepository = servicesRepository
     }
@@ -35,35 +35,43 @@ final class DefaultViewModel: ObservableObject {
             let allOption = EmployeeModel(id: UUID(), name: "All", services: [])
             self.employees = [allOption] + employees
         } catch {
-            print("❌ Failed to load employees:", error)
+            print("Failed to load employees:", error)
         }
     }
 
     func loadAppointments() async {
         do {
-            let appointments = try await repository.fetchAppointmentModels()
+            let appointments = try await appointmentRepository.fetchAppointmentModels()
             self.allAppointments = appointments
             filterAppointments()
         } catch {
-            print("❌ Failed to load appointments:", error)
+            print("Failed to load appointments:", error)
         }
     }
 
-    func createAppointment(clientName: String, startTime: Date, endTime: Date, employee: Employees, services: [Services]) async {
+    func createAppointment(clientName: String,appointmentDate: Date ,startTime: Date, endTime: Date, employee: Employees, services: [Services]) async {
         do {
-            _ = try await repository.createAppointment(clientName: clientName, startTime: startTime, endTime: endTime, employee: employee, services: services)
+            let hasConflict = try await appointmentRepository.hasConflict(for: employee, on: appointmentDate, startTime: startTime, endTime: endTime)
+                    
+                    if hasConflict {
+                        await MainActor.run {
+                            NotificationCenter.default.post(name: NSNotification.Name("AppointmentConflict"), object: nil)
+                        }
+                        return
+                    }
+            _ = try await appointmentRepository.createAppointment(clientName: clientName,appointmentDate: appointmentDate ,startTime: startTime, endTime: endTime, employee: employee, services: services)
             await loadAppointments()
         } catch {
-            print("❌ Failed to create appointment:", error)
+            print("Failed to create appointment:", error)
         }
     }
 
     func deleteAppointment(_ appointment: Appointmemts) async {
         do {
-            try await repository.deleteAppointment(appointment)
+            try await appointmentRepository.deleteAppointment(appointment)
             await loadAppointments()
         } catch {
-            print("❌ Failed to delete appointment:", error)
+            print("Failed to delete appointment:", error)
         }
     }
     
@@ -77,7 +85,7 @@ final class DefaultViewModel: ObservableObject {
             let services = try await employeesRepository.fetchServices(for: selectedId)
             return services
         } catch {
-            print("❌ Failed to fetch services for employee \(selectedId):", error)
+            print("Failed to fetch services for employee \(selectedId):", error)
             return []
         }
     }
@@ -103,13 +111,11 @@ final class DefaultViewModel: ObservableObject {
     
     func fetchAppointmentById(by id: UUID) async -> Appointmemts? {
         do {
-            let appointment = try await repository.fetchAppointmentEntity(by: id)
+            let appointment = try await appointmentRepository.fetchAppointmentEntity(by: id)
             return appointment
         } catch {
-            print("❌ Failed to fetch appointment with ID \(id):", error)
+            print("Failed to fetch appointment with ID \(id):", error)
             return nil
         }
     }
-
-
 }

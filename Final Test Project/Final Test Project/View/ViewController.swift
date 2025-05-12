@@ -8,9 +8,8 @@
 import UIKit
 import CoreData
 
-class ViewController: UIViewController {
-
-    
+class ViewController: UIViewController, AddAppointmentDelegate {
+   
     // MARK: - Oulets
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var datePicker: UIDatePicker!
@@ -34,16 +33,28 @@ class ViewController: UIViewController {
         }
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        Task {
-            await viewModel.loadAppointments()
+    // Delegate Method of AddApoinmentDelegate to ensure the appointment will be shown on the main screen.
+    func didAddAppointment() {
+            Task {
+                await viewModel.loadAppointments()
+                tableView.reloadData()
+            }
         }
-    }
     
     @IBAction func onDateChange(_ sender: UIDatePicker) {
         viewModel.selectedDate = sender.date
         tableView.reloadData()
+    }
+    
+    
+    // To perfrom segues to the add appointment Screen
+    @IBAction func addAppointmentPressed(_ sender: UIButton) {
+        performSegue(withIdentifier: "addAppointmentSegue", sender: self)
+    }
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if let addVC = segue.destination as? AddAppointmentViewController {
+            addVC.delegate = self
+        }
     }
     
 }
@@ -82,8 +93,6 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource {
             deselectedCell.contentView.backgroundColor = UIColor.clear
         }
     }
-
-
 }
 
 
@@ -123,10 +132,13 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
          cell.serviceLabelTableViewCell.text = serviceTitles.joined(separator: ", ")
          
          let dateFormatter = DateFormatter()
-         dateFormatter.dateStyle = .medium
-         dateFormatter.timeStyle = .short
-         let formattedStartTime = dateFormatter.string(from: appointment.startTime)
-         cell.timeLabelTableViewCell.text = formattedStartTime
+         dateFormatter.dateFormat = "MMM d, yyyy h:mm a"
+         let start = dateFormatter.string(from: appointment.startTime)
+         let endTimeFormatter = DateFormatter()
+         endTimeFormatter.dateFormat = "h:mm a"
+         let end = endTimeFormatter.string(from: appointment.endTime)
+         let formattedAppointment = "\(start) - \(end)"
+         cell.timeLabelTableViewCell.text = formattedAppointment
          
          cell.delegate = self
          return cell
@@ -157,7 +169,6 @@ extension ViewController: AppointmentCardCellDelegate {
     func didTapEdit(on cell: AppointmentCardTableViewCell) {
         guard let indexPath = tableView.indexPath(for: cell) else { return }
         let appointment = viewModel.appointments[indexPath.section]
-        // Implement edit logic if needed
         print("Edit tapped for appointment: \(appointment.clientName)")
     }
 
