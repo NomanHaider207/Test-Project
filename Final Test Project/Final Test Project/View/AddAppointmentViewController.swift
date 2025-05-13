@@ -134,7 +134,7 @@ class AddAppointmentViewController: UIViewController {
             createAppointment(clientName: clientName,
                               startTime: startDateTimePicker.date,
                               endTime: endDateTimePicker.date,
-                              employee: employee)
+                              employee: employee) 
 
         case .editAppointment(let existingAppointment):
             updateAppointment(existingAppointment: existingAppointment,

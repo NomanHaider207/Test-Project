@@ -2,15 +2,17 @@
 //  ViewController.swift
 //  Final Test Project
 //
-//  Created by Dev  on 5/7/25.
+//  Created by Dev on 5/7/25.
 //
 
 import UIKit
 import CoreData
 
-class ViewController: UIViewController, AddAppointmentDelegate{
+// MARK: - ViewController
+
+class ViewController: UIViewController {
     
-    // MARK: - Oulets
+    // MARK: - Outlets
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var datePicker: UIDatePicker!
     @IBOutlet weak var collectionView: UICollectionView!
@@ -19,43 +21,42 @@ class ViewController: UIViewController, AddAppointmentDelegate{
     private var viewModel: DefaultViewModel!
     private var screenMode: SelectionType = .addAppointment
     
+    // MARK: - Lifecycle Methods
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        setupUI()
+        loadData()
+    }
+    
+    // MARK: - Setup
+    private func setupUI() {
         tableView.register(UINib(nibName: "AppointmentCardTableViewCell", bundle: nil), forCellReuseIdentifier: "appointmentCard")
-        
-        self.viewModel = AppEnvironment.shared.viewModel
-        self.viewModel.delegate = self
-        
+        viewModel = AppEnvironment.shared.viewModel
+        viewModel.delegate = self
+    }
+    
+    private func loadData() {
         Task {
             await viewModel.loadEmployees()
             await viewModel.loadAppointments()
-            
-            self.collectionView.reloadData()
-            self.tableView.reloadData()
+            collectionView.reloadData()
+            tableView.reloadData()
         }
     }
     
-   
-
-    
-    // Delegate Method of AddApoinmentDelegate to ensure the appointment will be shown on the main screen.
-    func didAddAppointment() {
-            Task {
-                await viewModel.loadAppointments()
-                tableView.reloadData()
-            }
-        }
-    
+    // MARK: - Actions
     @IBAction func onDateChange(_ sender: UIDatePicker) {
         viewModel.selectedDate = sender.date
         tableView.reloadData()
     }
     
-    
-    // To perfrom segues to the add appointment Screen
     @IBAction func addAppointmentPressed(_ sender: UIButton) {
+        screenMode = .addAppointment
         performSegue(withIdentifier: "addAppointmentSegue", sender: self)
     }
+    
+    // MARK: - Navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if let addVC = segue.destination as? AddAppointmentViewController {
             addVC.delegate = self
@@ -68,35 +69,44 @@ class ViewController: UIViewController, AddAppointmentDelegate{
             }
         }
     }
-    
 }
 
+// MARK: - AddAppointmentDelegate
+extension ViewController: AddAppointmentDelegate {
+    func didAddAppointment() {
+        Task {
+            await viewModel.loadAppointments()
+            tableView.reloadData()
+        }
+    }
+}
 
-// MARK: - CollectionView Datasource and Delegate
-extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource {
+// MARK: - UICollectionViewDataSource & Delegate
+extension ViewController: UICollectionViewDataSource, UICollectionViewDelegate {
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return viewModel.employees.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "employeeSelectionCell", for: indexPath) as! EmployeeSelectionCollectionViewCell
-        cell.employeeNameLabel.text =  viewModel.employees[indexPath.row].name
+        let employee = viewModel.employees[indexPath.row]
+        
+        cell.employeeNameLabel.text = employee.name
         cell.layer.cornerRadius = 15
         cell.layer.masksToBounds = true
+        
         return cell
     }
     
-    
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let selectedEmployee = viewModel.employees[indexPath.row]
+        
         if let selectedCell = collectionView.cellForItem(at: indexPath) as? EmployeeSelectionCollectionViewCell {
             selectedCell.contentView.backgroundColor = UIColor(named: "appColor")
         }
-        if selectedEmployee.name == "All" {
-            viewModel.selectedEmployeeId = nil
-        } else {
-            viewModel.selectedEmployeeId = selectedEmployee.id
-        }
+        
+        viewModel.selectedEmployeeId = selectedEmployee.name == "All" ? nil : selectedEmployee.id
         tableView.reloadData()
     }
     
@@ -107,9 +117,8 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     }
 }
 
-
-// MARK: - TableView Datasource and Delegate
-extension ViewController: UITableViewDelegate, UITableViewDataSource {
+// MARK: - UITableViewDataSource & Delegate
+extension ViewController: UITableViewDataSource, UITableViewDelegate {
     
     func numberOfSections(in tableView: UITableView) -> Int {
         return viewModel.appointments.count
@@ -118,58 +127,48 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 1
     }
-     
-     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-         return 12
-     }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 12
+    }
+    
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let spacer = UIView()
+        spacer.backgroundColor = .clear
+        return spacer
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "appointmentCard", for: indexPath) as? AppointmentCardTableViewCell else {
+            return UITableViewCell()
+        }
 
-     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-         let spacer = UIView()
-         spacer.backgroundColor = .clear
-         return spacer
-     }
-
-     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-         guard let cell = tableView.dequeueReusableCell(withIdentifier: "appointmentCard", for: indexPath) as? AppointmentCardTableViewCell else {
-             return UITableViewCell()
-         }
-
+        let appointment = viewModel.appointments[indexPath.section]
         
-         let appointment = viewModel.appointments[indexPath.section]
-                  
-         cell.employeeNameLabelTableViewCell.text = appointment.employee.name
-         cell.clientNameTableViewCell.text = appointment.clientName
-         
-         let serviceTitles = appointment.services.map { $0.title }
-         cell.serviceLabelTableViewCell.text = serviceTitles.joined(separator: ", ")
-         
-         let dateFormatter = DateFormatter()
-         dateFormatter.dateFormat = "MMM d, h:mm a"
-         let start = dateFormatter.string(from: appointment.startTime)
-         let endTimeFormatter = DateFormatter()
-         endTimeFormatter.dateFormat = "MMM d, h:mm a"
-         let end = endTimeFormatter.string(from: appointment.endTime)
-         let formattedAppointment = "\(start) - \(end)"
-         cell.timeLabelTableViewCell.text = formattedAppointment
-         
-         cell.delegate = self
-         return cell
-     }
-
+        cell.employeeNameLabelTableViewCell.text = appointment.employee.name
+        cell.clientNameTableViewCell.text = appointment.clientName
+        cell.serviceLabelTableViewCell.text = appointment.services.map { $0.title }.joined(separator: ", ")
+        
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM d, h:mm a"
+        
+        let timeText = "\(formatter.string(from: appointment.startTime)) - \(formatter.string(from: appointment.endTime))"
+        cell.timeLabelTableViewCell.text = timeText
+        
+        cell.delegate = self
+        return cell
+    }
     
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        self.datePicker.isHidden = true
+        datePicker.isHidden = true
     }
-
+    
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        if scrollView.contentOffset.y <= 0 {
-            if datePicker.isHidden {
-                datePicker.isHidden = false
-                datePicker.alpha = 0
-                
-                UIView.animate(withDuration: 0.3) {
-                    self.datePicker.alpha = 1
-                }
+        if scrollView.contentOffset.y <= 0, datePicker.isHidden {
+            datePicker.alpha = 0
+            datePicker.isHidden = false
+            UIView.animate(withDuration: 0.3) {
+                self.datePicker.alpha = 1
             }
         }
     }
@@ -177,7 +176,7 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
 
 // MARK: - AppointmentCardCellDelegate
 extension ViewController: AppointmentCardCellDelegate {
-
+    
     func didTapEdit(on cell: AppointmentCardTableViewCell) {
         guard let indexPath = tableView.indexPath(for: cell) else { return }
         let appointment = viewModel.appointments[indexPath.section]
@@ -196,27 +195,27 @@ extension ViewController: AppointmentCardCellDelegate {
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         alert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { _ in
             Task {
-                    let appointmentEntity = try await self.viewModel.fetchAppointmentById(by: appointment.id)
-                    await self.viewModel.deleteAppointment(appointmentEntity!)
-                    self.tableView.reloadData()
+                let appointmentEntity = try await self.viewModel.fetchAppointmentById(by: appointment.id)
+                await self.viewModel.deleteAppointment(appointmentEntity!)
+                self.tableView.reloadData()
             }
         }))
         present(alert, animated: true)
     }
 }
 
-// MARK: - ViewModel Delegate
+// MARK: - ViewModelDelegate
 extension ViewController: ViewModelDelegate {
-        func didFailWithError(_ error: Error) {
-            DispatchQueue.main.async {
-                self.showErrorAlert(message: error.localizedDescription)
-            }
+    
+    func didFailWithError(_ error: Error) {
+        DispatchQueue.main.async {
+            self.showErrorAlert(message: error.localizedDescription)
         }
+    }
     
     private func showErrorAlert(message: String) {
-            let alert = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "OK", style: .default))
-            present(alert, animated: true)
-        }
+        let alert = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
+    }
 }
-
