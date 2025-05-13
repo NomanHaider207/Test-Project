@@ -12,6 +12,7 @@ import CoreData
 protocol ServiceRepositoryProtocol {
     func createService(title: String) async throws -> Services
     func fetchServices() async throws -> [Services]
+    func fetchServicesModel() async -> Result<[ServiceModel], Error>
     func deleteService(_ service: Services) async throws
     func fetchServiceEntities(by ids: [UUID]) async throws -> [Services] 
 }
@@ -36,6 +37,19 @@ class DefaultServiceRepository: ServiceRepositoryProtocol {
     func fetchServices() async throws -> [Services] {
         let request: NSFetchRequest<Services> = Services.fetchRequest()
         return try context.fetch(request)
+    }
+    
+    func fetchServicesModel() async -> Result<[ServiceModel], Error> {
+        do {
+            let services = try await fetchServices()
+            let models: [ServiceModel] = services.compactMap { service in
+                guard let id = service.id, let title = service.title else { return nil }
+                return ServiceModel(id: id, title: title)
+            }
+            return .success(models)
+        } catch {
+            return .failure(error)
+        }
     }
     
     func fetchServiceEntities(by ids: [UUID]) async throws -> [Services] {

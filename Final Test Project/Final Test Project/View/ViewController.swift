@@ -8,8 +8,8 @@
 import UIKit
 import CoreData
 
-class ViewController: UIViewController, AddAppointmentDelegate {
-   
+class ViewController: UIViewController, AddAppointmentDelegate{
+    
     // MARK: - Oulets
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var datePicker: UIDatePicker!
@@ -17,12 +17,14 @@ class ViewController: UIViewController, AddAppointmentDelegate {
     
     // MARK: - Properties
     private var viewModel: DefaultViewModel!
+    private var screenMode: SelectionType = .addAppointment
     
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.register(UINib(nibName: "AppointmentCardTableViewCell", bundle: nil), forCellReuseIdentifier: "appointmentCard")
         
         self.viewModel = AppEnvironment.shared.viewModel
+        self.viewModel.delegate = self
         
         Task {
             await viewModel.loadEmployees()
@@ -32,6 +34,9 @@ class ViewController: UIViewController, AddAppointmentDelegate {
             self.tableView.reloadData()
         }
     }
+    
+   
+
     
     // Delegate Method of AddApoinmentDelegate to ensure the appointment will be shown on the main screen.
     func didAddAppointment() {
@@ -54,6 +59,13 @@ class ViewController: UIViewController, AddAppointmentDelegate {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if let addVC = segue.destination as? AddAppointmentViewController {
             addVC.delegate = self
+            
+            switch screenMode {
+            case .addAppointment:
+                addVC.selectionType = .addAppointment
+            case .editAppointment(let appointment):
+                addVC.selectionType = .editAppointment(existingAppointment: appointment)
+            }
         }
     }
     
@@ -132,10 +144,10 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
          cell.serviceLabelTableViewCell.text = serviceTitles.joined(separator: ", ")
          
          let dateFormatter = DateFormatter()
-         dateFormatter.dateFormat = "MMM d, yyyy h:mm a"
+         dateFormatter.dateFormat = "MMM d, h:mm a"
          let start = dateFormatter.string(from: appointment.startTime)
          let endTimeFormatter = DateFormatter()
-         endTimeFormatter.dateFormat = "h:mm a"
+         endTimeFormatter.dateFormat = "MMM d, h:mm a"
          let end = endTimeFormatter.string(from: appointment.endTime)
          let formattedAppointment = "\(start) - \(end)"
          cell.timeLabelTableViewCell.text = formattedAppointment
@@ -169,6 +181,8 @@ extension ViewController: AppointmentCardCellDelegate {
     func didTapEdit(on cell: AppointmentCardTableViewCell) {
         guard let indexPath = tableView.indexPath(for: cell) else { return }
         let appointment = viewModel.appointments[indexPath.section]
+        screenMode = .editAppointment(existingAppointment: appointment)
+        performSegue(withIdentifier: "addAppointmentSegue", sender: self)
         print("Edit tapped for appointment: \(appointment.clientName)")
     }
 
@@ -189,5 +203,20 @@ extension ViewController: AppointmentCardCellDelegate {
         }))
         present(alert, animated: true)
     }
+}
+
+// MARK: - ViewModel Delegate
+extension ViewController: ViewModelDelegate {
+        func didFailWithError(_ error: Error) {
+            DispatchQueue.main.async {
+                self.showErrorAlert(message: error.localizedDescription)
+            }
+        }
+    
+    private func showErrorAlert(message: String) {
+            let alert = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default))
+            present(alert, animated: true)
+        }
 }
 

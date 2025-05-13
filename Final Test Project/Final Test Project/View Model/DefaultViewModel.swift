@@ -1,11 +1,16 @@
 import Foundation
 
+protocol ViewModelDelegate: AnyObject {
+    func didFailWithError(_ error: Error)
+}
+
 @MainActor
 final class DefaultViewModel: ObservableObject {
     
     private let appointmentRepository: AppointmentRepositoryProtocol
     private let employeesRepository: EmployeeRepositoryProtocol
     private let servicesRepository: ServiceRepositoryProtocol
+    weak var delegate: ViewModelDelegate?
 
     @Published private(set) var appointments: [AppointmentModel] = []
     private(set) var allAppointments: [AppointmentModel] = []
@@ -30,28 +35,32 @@ final class DefaultViewModel: ObservableObject {
     }
 
     func loadEmployees() async {
-        do {
-            let employees = try await employeesRepository.fetchEmployeeModels()
+        let result = await employeesRepository.fetchEmployeeModels()
+        switch result {
+        case .success(let employees):
             let allOption = EmployeeModel(id: UUID(), name: "All", services: [])
             self.employees = [allOption] + employees
-        } catch {
-            print("Failed to load employees:", error)
+        case .failure(let error):
+            delegate?.didFailWithError(error)
         }
     }
+
 
     func loadAppointments() async {
-        do {
-            let appointments = try await appointmentRepository.fetchAppointmentModels()
-            self.allAppointments = appointments
-            filterAppointments()
-        } catch {
-            print("Failed to load appointments:", error)
-        }
+            let results = await appointmentRepository.fetchAppointmentModels()
+            switch results {
+            case .success(let appointments):
+                self.allAppointments = appointments
+                filterAppointments()
+            case .failure(let error):
+                delegate?.didFailWithError(error)
+            }
+           
     }
 
-    func createAppointment(clientName: String,appointmentDate: Date ,startTime: Date, endTime: Date, employee: Employees, services: [Services]) async {
+    func createAppointment(clientName: String, startTime: Date, endTime: Date, employee: Employees, services: [Services]) async {
         do {
-            let hasConflict = try await appointmentRepository.hasConflict(for: employee, on: appointmentDate, startTime: startTime, endTime: endTime)
+            let hasConflict = try await appointmentRepository.hasConflict(for: employee, startTime: startTime, endTime: endTime)
                     
                     if hasConflict {
                         await MainActor.run {
@@ -59,7 +68,7 @@ final class DefaultViewModel: ObservableObject {
                         }
                         return
                     }
-            _ = try await appointmentRepository.createAppointment(clientName: clientName,appointmentDate: appointmentDate ,startTime: startTime, endTime: endTime, employee: employee, services: services)
+            _ = try await appointmentRepository.createAppointment(clientName: clientName,startTime: startTime, endTime: endTime, employee: employee, services: services)
             await loadAppointments()
         } catch {
             print("Failed to create appointment:", error)
@@ -80,19 +89,26 @@ final class DefaultViewModel: ObservableObject {
         guard let selectedId = selectedEmployeeId else {
             return []
         }
-        
-        do {
-            let services = try await employeesRepository.fetchServices(for: selectedId)
-            return services
-        } catch {
-            print("Failed to fetch services for employee \(selectedId):", error)
+        let result = await employeesRepository.fetchServices(for: selectedId)
+        switch result {
+        case .success(let serviceModels):
+            return serviceModels
+        case.failure(let error):
+            delegate?.didFailWithError(error)
             return []
         }
     }
     
-    
-    func fetchEmployeeEntity(by id: UUID) async throws -> Employees {
-        return try await employeesRepository.fetchEmployeeEntity(by: id)
+    func fetchEmployeeEntity(by id: UUID) async -> Employees? {
+        
+        let results = await employeesRepository.fetchEmployeeEntity(by: id)
+        switch results {
+        case .success(let employee):
+            return employee
+        case .failure(let error):
+            delegate?.didFailWithError(error)
+            return nil
+        }
     }
 
     func fetchServiceEntities(by ids: [UUID]) async throws -> [Services] {
@@ -102,12 +118,24 @@ final class DefaultViewModel: ObservableObject {
 
     private func filterAppointments() {
         let calendar = Calendar.current
+
         self.appointments = allAppointments.filter { appointment in
-            let matchesDate = calendar.isDate(appointment.startTime, inSameDayAs: selectedDate)
+            let startOfSelectedDate = calendar.startOfDay(for: selectedDate)
+            guard let endOfSelectedDate = calendar.date(byAdding: .day, value: 1, to: startOfSelectedDate) else {
+                return false
+            }
+
+            let appointmentStart = appointment.startTime
+            let appointmentEnd = appointment.endTime
+
+            let isOverlapping = appointmentStart < endOfSelectedDate && appointmentEnd >= startOfSelectedDate
+
             let matchesEmployee = selectedEmployeeId == nil || appointment.employee.id == selectedEmployeeId
-            return matchesDate && matchesEmployee
+
+            return isOverlapping && matchesEmployee
         }
     }
+
     
     func fetchAppointmentById(by id: UUID) async -> Appointmemts? {
         do {
@@ -117,5 +145,26 @@ final class DefaultViewModel: ObservableObject {
             print("Failed to fetch appointment with ID \(id):", error)
             return nil
         }
+    }
+    
+    
+    func fetchServices() async -> [ServiceModel] {
+        let results = await servicesRepository.fetchServicesModel()
+        switch results {
+        case .success(let services):
+            return services
+        case .failure(let error):
+            delegate?.didFailWithError(error)
+            return []
+        }
+    }
+    
+    func updateAppointmentModel(appointment: AppointmentModel, clientName: String, startTime: Date, endTime: Date, employee: Employees, services: [Services]) async {
+        await appointmentRepository.updateAppointment(appointment: appointment,
+                                                clientName: clientName,
+                                                startTime: startTime,
+                                                endTime: endTime,
+                                                employee: employee,
+                                                services: services)
     }
 }
