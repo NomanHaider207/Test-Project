@@ -1,9 +1,4 @@
-//
-//  ViewController.swift
-//  Final Test Project
-//
-//  Created by Dev on 5/7/25.
-//
+// ViewController.swift - Updated to use ViewModel for business logic
 
 import UIKit
 import CoreData
@@ -32,7 +27,7 @@ class ViewController: UIViewController {
     // MARK: - Setup
     private func setupUI() {
         tableView.register(UINib(nibName: "AppointmentCardTableViewCell", bundle: nil), forCellReuseIdentifier: "appointmentCard")
-        viewModel = AppEnvironment.shared.viewModel
+        viewModel = DefaultViewModel(networkManager: AppEnvironment.shared.networkManger)
         viewModel.delegate = self
     }
     
@@ -40,15 +35,15 @@ class ViewController: UIViewController {
         Task {
             await viewModel.loadEmployees()
             await viewModel.loadAppointments()
-            collectionView.reloadData()
+            
             tableView.reloadData()
+            collectionView.reloadData()
         }
     }
     
     // MARK: - Actions
     @IBAction func onDateChange(_ sender: UIDatePicker) {
         viewModel.selectedDate = sender.date
-        tableView.reloadData()
     }
     
     @IBAction func addAppointmentPressed(_ sender: UIButton) {
@@ -69,6 +64,12 @@ class ViewController: UIViewController {
             }
         }
     }
+    
+    private func showAlert(title: String,message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
+    }
 }
 
 // MARK: - AddAppointmentDelegate
@@ -85,36 +86,45 @@ extension ViewController: AddAppointmentDelegate {
 extension ViewController: UICollectionViewDataSource, UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return viewModel.employees.count
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "employeeSelectionCell", for: indexPath) as! EmployeeSelectionCollectionViewCell
-        let employee = viewModel.employees[indexPath.row]
-        
-        cell.employeeNameLabel.text = employee.name
-        cell.layer.cornerRadius = 15
-        cell.layer.masksToBounds = true
-        
-        return cell
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let selectedEmployee = viewModel.employees[indexPath.row]
-        
-        if let selectedCell = collectionView.cellForItem(at: indexPath) as? EmployeeSelectionCollectionViewCell {
-            selectedCell.contentView.backgroundColor = UIColor(named: "appColor")
+            return viewModel.employees.count
         }
-        
-        viewModel.selectedEmployeeId = selectedEmployee.name == "All" ? nil : selectedEmployee.id
-        tableView.reloadData()
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
-        if let deselectedCell = collectionView.cellForItem(at: indexPath) as? EmployeeSelectionCollectionViewCell {
-            deselectedCell.contentView.backgroundColor = UIColor.clear
+
+        func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "employeeSelectionCell", for: indexPath) as! EmployeeSelectionCollectionViewCell
+            let employee = viewModel.employees[indexPath.row]
+            configureCell(cell, with: employee)
+            return cell
         }
-    }
+
+        // MARK: - UICollectionViewDelegate
+
+        func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+            viewModel.selectEmployee(at: indexPath.row)
+            collectionView.reloadData() // Reload all cells to update selected background
+        }
+
+        // Optional: you may remove this since reloadData will handle deselection UI
+        func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
+            if let deselectedCell = collectionView.cellForItem(at: indexPath) as? EmployeeSelectionCollectionViewCell {
+                deselectedCell.contentView.backgroundColor = .clear
+            }
+        }
+
+        // MARK: - Cell Configuration
+
+        private func configureCell(_ cell: EmployeeSelectionCollectionViewCell, with employee: EmployeeModel) {
+            cell.employeeNameLabel.text = employee.name
+            cell.layer.cornerRadius = 15
+            cell.layer.masksToBounds = true
+
+            if let selectedId = viewModel.selectedEmployeeId, employee.id == selectedId {
+                cell.contentView.backgroundColor = UIColor(named: "appColor")
+            } else if employee.name == "All" && viewModel.selectedEmployeeId == nil {
+                cell.contentView.backgroundColor = UIColor(named: "appColor")
+            } else {
+                cell.contentView.backgroundColor = .clear
+            }
+        }
 }
 
 // MARK: - UITableViewDataSource & Delegate
@@ -142,20 +152,8 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "appointmentCard", for: indexPath) as? AppointmentCardTableViewCell else {
             return UITableViewCell()
         }
-
-        let appointment = viewModel.appointments[indexPath.section]
         
-        cell.employeeNameLabelTableViewCell.text = appointment.employee.name
-        cell.clientNameTableViewCell.text = appointment.clientName
-        cell.serviceLabelTableViewCell.text = appointment.services.map { $0.title }.joined(separator: ", ")
-        
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MMM d, h:mm a"
-        
-        let timeText = "\(formatter.string(from: appointment.startTime)) - \(formatter.string(from: appointment.endTime))"
-        cell.timeLabelTableViewCell.text = timeText
-        
-        cell.delegate = self
+        configure(cell, at: indexPath.section)
         return cell
     }
     
@@ -165,12 +163,19 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         if scrollView.contentOffset.y <= 0, datePicker.isHidden {
-            datePicker.alpha = 0
             datePicker.isHidden = false
-            UIView.animate(withDuration: 0.3) {
-                self.datePicker.alpha = 1
-            }
         }
+    }
+    
+    private func configure(_ cell: AppointmentCardTableViewCell, at section: Int) {
+        let appointment = self.viewModel.appointments[section]
+
+        cell.employeeNameLabelTableViewCell.text = appointment.employee.name
+        cell.clientNameTableViewCell.text = appointment.clientName
+        cell.serviceLabelTableViewCell.text = appointment.services.map { $0.title }.joined(separator: ", ")
+        cell.timeLabelTableViewCell.text = viewModel.formattedTime(for: appointment)
+
+        cell.delegate = self
     }
 }
 
@@ -182,26 +187,35 @@ extension ViewController: AppointmentCardCellDelegate {
         let appointment = viewModel.appointments[indexPath.section]
         screenMode = .editAppointment(existingAppointment: appointment)
         performSegue(withIdentifier: "addAppointmentSegue", sender: self)
-        print("Edit tapped for appointment: \(appointment.clientName)")
     }
 
     func didTapDelete(on cell: AppointmentCardTableViewCell) {
-        guard let indexPath = tableView.indexPath(for: cell) else { return }
-        let appointment = viewModel.appointments[indexPath.section]
+            guard let indexPath = tableView.indexPath(for: cell) else { return }
+            let appointment = viewModel.appointments[indexPath.section]
+            
+            // Create the alert
+            let alert = UIAlertController(
+                title: "Confirm Deletion",
+                message: "Are you sure you want to delete this appointment?",
+                preferredStyle: .alert
+            )
 
-        let alert = UIAlertController(title: "Confirm Deletion",
-                                      message: "Are you sure you want to delete this appointment?",
-                                      preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-        alert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { _ in
-            Task {
-                let appointmentEntity = try await self.viewModel.fetchAppointmentById(by: appointment.id)
-                await self.viewModel.deleteAppointment(appointmentEntity!)
-                self.tableView.reloadData()
-            }
-        }))
-        present(alert, animated: true)
-    }
+            // Cancel button
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+
+            // Delete button
+            alert.addAction(UIAlertAction(
+                title: "Delete",
+                style: .destructive,
+                handler: { _ in
+    
+                    Task {
+                        await self.viewModel.deleteAppointment(appointment.id)
+                    }
+                }
+            ))
+            present(alert, animated: true)
+        }
 }
 
 // MARK: - ViewModelDelegate
@@ -209,13 +223,14 @@ extension ViewController: ViewModelDelegate {
     
     func didFailWithError(_ error: Error) {
         DispatchQueue.main.async {
-            self.showErrorAlert(message: error.localizedDescription)
+            self.showAlert(title: "Error", message: error.localizedDescription)
         }
     }
     
-    private func showErrorAlert(message: String) {
-        let alert = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default))
-        present(alert, animated: true)
+    func didUpdateData() {
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+            self.collectionView.reloadData()
+        }
     }
 }

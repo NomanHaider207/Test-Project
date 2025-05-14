@@ -13,8 +13,8 @@ final class AppEnvironment {
     static let shared: AppEnvironment = {
         return AppEnvironment()
     }()
-
-    let viewModel: DefaultViewModel
+    
+    let networkManger: NetworkManager
 
     @MainActor
     private init() {
@@ -22,7 +22,7 @@ final class AppEnvironment {
         let appointmentRepo = DefaultAppointmentRepository(context: context)
         let employeeRepo = DefaultEmployeeRepository(context: context)
         let servicesRepo = DefaultServiceRepository(context: context)
-        self.viewModel = DefaultViewModel(repository: appointmentRepo, employeesRepository: employeeRepo, servicesRepository: servicesRepo)
+        self.networkManger = NetworkManager(appointmentRepo: appointmentRepo, employeeRepo: employeeRepo, serviceRepo: servicesRepo)
     }
 }
 

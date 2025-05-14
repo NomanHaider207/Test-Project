@@ -13,6 +13,9 @@
 		D72531FB2DCCEC980048E613 /* AddAppointmentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D72531FA2DCCEC980048E613 /* AddAppointmentViewController.swift */; };
 		D72531FE2DCCFBD40048E613 /* AppEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = D72531FD2DCCFBD40048E613 /* AppEnvironment.swift */; };
 		D73E37492DD24EA6003EBA21 /* ServiceSelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D73E37482DD24EA6003EBA21 /* ServiceSelectionViewController.swift */; };
+		D76F10D02DD4C0F800D87AB7 /* Validator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D76F10CF2DD4C0F300D87AB7 /* Validator.swift */; };
+		D76F10D22DD4D8D100D87AB7 /* AddApointmentViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D76F10D12DD4D8C800D87AB7 /* AddApointmentViewModel.swift */; };
+		D76F10D92DD4E37A00D87AB7 /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D76F10D82DD4E37A00D87AB7 /* NetworkManager.swift */; };
 		D77B06672DD36786007B558B /* AddEmployeeAndServiceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D77B06662DD36786007B558B /* AddEmployeeAndServiceViewController.swift */; };
 		D7B548F92DCBDF190094BA51 /* CoreDataModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7B548E52DCBDF190094BA51 /* CoreDataModels.swift */; };
 		D7B548FA2DCBDF190094BA51 /* AppointmentCardTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7B548E72DCBDF190094BA51 /* AppointmentCardTableViewCell.swift */; };
@@ -61,6 +64,9 @@
 		D76C15402DCB6438003EC626 /* Final Test Project.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Final Test Project.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D76C15592DCB643B003EC626 /* Final Test ProjectTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Final Test ProjectTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D76C15632DCB643B003EC626 /* Final Test ProjectUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Final Test ProjectUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		D76F10CF2DD4C0F300D87AB7 /* Validator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Validator.swift; sourceTree = "<group>"; };
+		D76F10D12DD4D8C800D87AB7 /* AddApointmentViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddApointmentViewModel.swift; sourceTree = "<group>"; };
+		D76F10D82DD4E37A00D87AB7 /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
 		D77B06662DD36786007B558B /* AddEmployeeAndServiceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEmployeeAndServiceViewController.swift; sourceTree = "<group>"; };
 		D7B548E52DCBDF190094BA51 /* CoreDataModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataModels.swift; sourceTree = "<group>"; };
 		D7B548E72DCBDF190094BA51 /* AppointmentCardTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppointmentCardTableViewCell.swift; sourceTree = "<group>"; };
@@ -150,6 +156,7 @@
 		D72531FC2DCCFBBB0048E613 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				D76F10CF2DD4C0F300D87AB7 /* Validator.swift */,
 				D72531FD2DCCFBD40048E613 /* AppEnvironment.swift */,
 			);
 			path = Utilities;
@@ -204,6 +211,7 @@
 		D7B548F12DCBDF190094BA51 /* View Model */ = {
 			isa = PBXGroup;
 			children = (
+				D76F10D12DD4D8C800D87AB7 /* AddApointmentViewModel.swift */,
 				D7B548F02DCBDF190094BA51 /* DefaultViewModel.swift */,
 			);
 			path = "View Model";
@@ -229,6 +237,7 @@
 		D7B549062DCBDF1F0094BA51 /* DatabaseRepositories */ = {
 			isa = PBXGroup;
 			children = (
+				D76F10D82DD4E37A00D87AB7 /* NetworkManager.swift */,
 				D7B5490B2DCBE04A0094BA51 /* AppointmentRepository.swift */,
 				D7B549092DCBDFC60094BA51 /* EmployeeRepository.swift */,
 				D7B549072DCBDF510094BA51 /* ServiceRepository.swift */,
@@ -447,6 +456,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D76F10D92DD4E37A00D87AB7 /* NetworkManager.swift in Sources */,
+				D76F10D02DD4C0F800D87AB7 /* Validator.swift in Sources */,
 				D72531FB2DCCEC980048E613 /* AddAppointmentViewController.swift in Sources */,
 				D7B548F92DCBDF190094BA51 /* CoreDataModels.swift in Sources */,
 				D7B549082DCBDF510094BA51 /* ServiceRepository.swift in Sources */,
@@ -456,6 +467,7 @@
 				D73E37492DD24EA6003EBA21 /* ServiceSelectionViewController.swift in Sources */,
 				D7B5490A2DCBDFDA0094BA51 /* EmployeeRepository.swift in Sources */,
 				D7B548FD2DCBDF190094BA51 /* DefaultViewModel.swift in Sources */,
+				D76F10D22DD4D8D100D87AB7 /* AddApointmentViewModel.swift in Sources */,
 				D72531FE2DCCFBD40048E613 /* AppEnvironment.swift in Sources */,
 				D7B548FE2DCBDF190094BA51 /* AppDelegate.swift in Sources */,
 				D7B5490C2DCBE04C0094BA51 /* AppointmentRepository.swift in Sources */,
