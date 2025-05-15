@@ -22,6 +22,8 @@ class AppointmentCardTableViewCell: UITableViewCell {
     @IBOutlet weak var serviceLabelTableViewCell: UILabel!
     @IBOutlet weak var optionsButton: UIButton!
     
+    static let identifier = "appointmentCard"
+    
     weak var delegate: AppointmentCardCellDelegate?
     
     override func awakeFromNib() {
@@ -59,6 +61,13 @@ class AppointmentCardTableViewCell: UITableViewCell {
     }
     
     @IBAction func onOptionsButtonPressed(_ sender: UIButton) {
+    }
+    
+    func configure(_ cell: AppointmentCardTableViewCell, at section: Int, appointment: AppointmentModel) {
+        
+        cell.employeeNameLabelTableViewCell.text = appointment.employee.name
+        cell.clientNameTableViewCell.text = appointment.clientName
+        cell.serviceLabelTableViewCell.text = appointment.services.map { $0.title }.joined(separator: ", ")
     }
     
 }

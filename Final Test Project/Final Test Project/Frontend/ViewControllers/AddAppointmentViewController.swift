@@ -7,7 +7,7 @@ protocol AddAppointmentDelegate: AnyObject {
 
 
 // MARK: - Enums
-enum SelectionType {
+enum ScreenMode {
     case addAppointment
     case editAppointment(existingAppointment: AppointmentModel)
 }
@@ -30,7 +30,7 @@ class AddAppointmentViewController: UIViewController {
     
     // MARK: - Properties
     private var viewModel: AddAppointmentViewModel!
-    var selectionType: SelectionType = .addAppointment
+    var selectionType: ScreenMode = .addAppointment
     weak var delegate: AddAppointmentDelegate?
 
     // MARK: - Lifecycle
@@ -45,6 +45,26 @@ class AddAppointmentViewController: UIViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         viewModel.resetSelectedEmployee()
+    }
+    
+    // MARK: - Actions
+    @IBAction func onCreateAppointmentButtonPressed(_ sender: UIButton) {
+        guard viewModel.validateAllFields(clientName: clientNameTextView.text) else {
+            Utilities.shared.showAlert(title: "Notice",message: "Please fill all fields and select at least one service.")
+            return
+        }
+
+        switch selectionType {
+        case .addAppointment:
+            createAppointment()
+        case .editAppointment(let existingAppointment):
+            updateAppointment(existingAppointment: existingAppointment)
+        }
+    }
+
+    @IBAction func backButtonPressed(_ sender: UIButton) {
+        viewModel.resetSelectedEmployee()
+        dismiss(animated: true)
     }
 
     // MARK: - Setup
@@ -140,30 +160,10 @@ class AddAppointmentViewController: UIViewController {
             employeePickerView.reloadAllComponents()
         }
     }
-
-    // MARK: - Actions
-    @IBAction func onCreateAppointmentButtonPressed(_ sender: UIButton) {
-        guard viewModel.validateAllFields(clientName: clientNameTextView.text) else {
-            showAlert(message: "Please fill all fields and select at least one service.")
-            return
-        }
-
-        switch selectionType {
-        case .addAppointment:
-            createAppointment()
-        case .editAppointment(let existingAppointment):
-            updateAppointment(existingAppointment: existingAppointment)
-        }
-    }
-
-    @IBAction func backButtonPressed(_ sender: UIButton) {
-        viewModel.resetSelectedEmployee()
-        dismiss(animated: true)
-    }
-
+    
     @objc private func serviceFieldTapped() {
         if !viewModel.canSelectServices() {
-            showAlert(message: "Please select an employee first.")
+            Utilities.shared.showAlert(title: "Notice", message: "Please select an employee first.")
             return
         }
         performSegue(withIdentifier: "showServiceSelection", sender: self)
@@ -185,7 +185,7 @@ class AddAppointmentViewController: UIViewController {
         let end = endDateTimePicker.date
         
         if !viewModel.canSetEndTime(end) {
-            showAlert(message: "End time cannot be earlier than start time.")
+            Utilities.shared.showAlert(title: "Notice", message: "End time cannot be earlier than start time.")
             endTimeTextView.text = ""
             return
         }
@@ -200,14 +200,14 @@ class AddAppointmentViewController: UIViewController {
     }
 
     @objc private func showConflictAlert() {
-        showAlert(message: "This employee already has an appointment during this time.")
+        Utilities.shared.showAlert(title: "Notice",message: "This employee already has an appointment during this time.")
     }
 
     // MARK: - Validation
     private func validateTimeRange() {
         if !viewModel.validateTimeRange() {
             endTimeTextView.text = ""
-            showAlert(message: "Invalid time range. Appointment can't be longer than 5 hours.")
+            Utilities.shared.showAlert(title: "Notice",message: "Invalid time range. Appointment can't be longer than 5 hours.")
         }
     }
 
@@ -218,12 +218,15 @@ class AddAppointmentViewController: UIViewController {
                 let success = await viewModel.createAppointment(clientName: clientNameTextView.text ?? "")
                 if success {
                     await MainActor.run {
-                        showSuccessAlert(message: "Appointment added successfully.")
+                        Utilities.shared.showAlert(title: "Success", message: "Appointment updated successfully.") {
+                            self.delegate?.didAddAppointment()
+                            self.dismiss(animated: true)
+                        }
                     }
                 }
             } catch {
                 await MainActor.run {
-                    showErrorAlert(message: "Failed to create appointment: \(error.localizedDescription)")
+                    Utilities.shared.showAlert(title: "Error", message: "Failed to create appointment: \(error.localizedDescription)")
                 }
             }
         }
@@ -235,12 +238,15 @@ class AddAppointmentViewController: UIViewController {
                 let success = await viewModel.updateAppointment(existingAppointment: existingAppointment, clientName: clientNameTextView.text ?? "")
                 if success {
                     await MainActor.run {
-                        showSuccessAlert(message: "Appointment updated successfully.")
+                        Utilities.shared.showAlert(title: "Success", message: "Appointment updated successfully.") {
+                            self.delegate?.didAddAppointment()
+                            self.dismiss(animated: true)
+                        }
                     }
                 }
             } catch {
                 await MainActor.run {
-                    showErrorAlert(message: "Failed to update appointment: \(error.localizedDescription)")
+                    Utilities.shared.showAlert(title: "Error", message: "Failed to update appointment: \(error.localizedDescription)")
                 }
             }
         }
@@ -254,28 +260,6 @@ class AddAppointmentViewController: UIViewController {
             destinationVC.selectedServices = viewModel.selectedServices
             destinationVC.delegate = self
         }
-    }
-
-    // MARK: - Alerts
-    private func showAlert(message: String) {
-        let alert = UIAlertController(title: "Notice", message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default))
-        present(alert, animated: true)
-    }
-
-    private func showErrorAlert(message: String) {
-        let alert = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default))
-        present(alert, animated: true)
-    }
-    
-    private func showSuccessAlert(message: String) {
-        let alert = UIAlertController(title: "Success", message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default) { _ in
-            self.delegate?.didAddAppointment()
-            self.dismiss(animated: true)
-        })
-        self.present(alert, animated: true)
     }
 }
 
@@ -306,7 +290,7 @@ extension AddAppointmentViewController: UITextFieldDelegate {
             let currentText = (textField.text ?? "") as NSString
             let updatedText = currentText.replacingCharacters(in: range, with: string)
             
-            clientNameErrorLabel.isHidden = viewModel.validateName(updatedText)
+            clientNameErrorLabel.isHidden = viewModel   .validateName(updatedText)
             if !clientNameErrorLabel.isHidden {
                 clientNameErrorLabel.text = "Name must contain alphabets only"
             }
@@ -348,7 +332,7 @@ extension AddAppointmentViewController: AddApointmentViewModlDelegate {
     
     func didFailWithError(_ error: any Error) {
         DispatchQueue.main.async {
-            self.showErrorAlert(message: "Failed to update appointment: \(error.localizedDescription)")
+            Utilities.shared.showAlert(title:"Error",message: "Failed to update appointment: \(error.localizedDescription)")
         }
     }
 }

@@ -16,6 +16,7 @@
 		D76F10D02DD4C0F800D87AB7 /* Validator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D76F10CF2DD4C0F300D87AB7 /* Validator.swift */; };
 		D76F10D22DD4D8D100D87AB7 /* AddApointmentViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D76F10D12DD4D8C800D87AB7 /* AddApointmentViewModel.swift */; };
 		D76F10D92DD4E37A00D87AB7 /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D76F10D82DD4E37A00D87AB7 /* NetworkManager.swift */; };
+		D76F10DB2DD5232500D87AB7 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = D76F10DA2DD5232200D87AB7 /* Utilities.swift */; };
 		D77B06672DD36786007B558B /* AddEmployeeAndServiceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D77B06662DD36786007B558B /* AddEmployeeAndServiceViewController.swift */; };
 		D7B548F92DCBDF190094BA51 /* CoreDataModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7B548E52DCBDF190094BA51 /* CoreDataModels.swift */; };
 		D7B548FA2DCBDF190094BA51 /* AppointmentCardTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7B548E72DCBDF190094BA51 /* AppointmentCardTableViewCell.swift */; };
@@ -67,6 +68,7 @@
 		D76F10CF2DD4C0F300D87AB7 /* Validator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Validator.swift; sourceTree = "<group>"; };
 		D76F10D12DD4D8C800D87AB7 /* AddApointmentViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddApointmentViewModel.swift; sourceTree = "<group>"; };
 		D76F10D82DD4E37A00D87AB7 /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
+		D76F10DA2DD5232200D87AB7 /* Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
 		D77B06662DD36786007B558B /* AddEmployeeAndServiceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEmployeeAndServiceViewController.swift; sourceTree = "<group>"; };
 		D7B548E52DCBDF190094BA51 /* CoreDataModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataModels.swift; sourceTree = "<group>"; };
 		D7B548E72DCBDF190094BA51 /* AppointmentCardTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppointmentCardTableViewCell.swift; sourceTree = "<group>"; };
@@ -156,6 +158,7 @@
 		D72531FC2DCCFBBB0048E613 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				D76F10DA2DD5232200D87AB7 /* Utilities.swift */,
 				D76F10CF2DD4C0F300D87AB7 /* Validator.swift */,
 				D72531FD2DCCFBD40048E613 /* AppEnvironment.swift */,
 			);
@@ -184,28 +187,97 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		D76F10DC2DD5277A00D87AB7 /* Frontend */ = {
+			isa = PBXGroup;
+			children = (
+				D76F10DF2DD527D000D87AB7 /* Cells */,
+				D76F10DE2DD527B500D87AB7 /* Storyboards */,
+				D76F10DD2DD5279600D87AB7 /* ViewControllers */,
+			);
+			path = Frontend;
+			sourceTree = "<group>";
+		};
+		D76F10DD2DD5279600D87AB7 /* ViewControllers */ = {
+			isa = PBXGroup;
+			children = (
+				D72531FA2DCCEC980048E613 /* AddAppointmentViewController.swift */,
+				D7B548EE2DCBDF190094BA51 /* ViewController.swift */,
+				D77B06662DD36786007B558B /* AddEmployeeAndServiceViewController.swift */,
+				D73E37482DD24EA6003EBA21 /* ServiceSelectionViewController.swift */,
+			);
+			path = ViewControllers;
+			sourceTree = "<group>";
+		};
+		D76F10DE2DD527B500D87AB7 /* Storyboards */ = {
+			isa = PBXGroup;
+			children = (
+				D7B548ED2DCBDF190094BA51 /* Main.storyboard */,
+				D7B548EB2DCBDF190094BA51 /* LaunchScreen.storyboard */,
+			);
+			path = Storyboards;
+			sourceTree = "<group>";
+		};
+		D76F10DF2DD527D000D87AB7 /* Cells */ = {
+			isa = PBXGroup;
+			children = (
+				D7B548E72DCBDF190094BA51 /* AppointmentCardTableViewCell.swift */,
+				D7B548E82DCBDF190094BA51 /* AppointmentCardTableViewCell.xib */,
+				D7B548E92DCBDF190094BA51 /* EmployeeSelectionCollectionViewCell.swift */,
+			);
+			path = Cells;
+			sourceTree = "<group>";
+		};
+		D76F10E02DD5284A00D87AB7 /* Backend */ = {
+			isa = PBXGroup;
+			children = (
+				D76F10E22DD5288600D87AB7 /* Managers */,
+				D76F10E12DD5287900D87AB7 /* Database */,
+				D7B548E62DCBDF190094BA51 /* Model */,
+				D7B548F12DCBDF190094BA51 /* View Model */,
+			);
+			path = Backend;
+			sourceTree = "<group>";
+		};
+		D76F10E12DD5287900D87AB7 /* Database */ = {
+			isa = PBXGroup;
+			children = (
+				D7B548F42DCBDF190094BA51 /* Final_Test_Project.xcdatamodeld */,
+				D7B549062DCBDF1F0094BA51 /* DatabaseRepositories */,
+			);
+			path = Database;
+			sourceTree = "<group>";
+		};
+		D76F10E22DD5288600D87AB7 /* Managers */ = {
+			isa = PBXGroup;
+			children = (
+				D76F10D82DD4E37A00D87AB7 /* NetworkManager.swift */,
+			);
+			path = Managers;
+			sourceTree = "<group>";
+		};
+		D76F10E32DD528BB00D87AB7 /* Application */ = {
+			isa = PBXGroup;
+			children = (
+				D7B548F22DCBDF190094BA51 /* AppDelegate.swift */,
+				D7B548F62DCBDF190094BA51 /* SceneDelegate.swift */,
+			);
+			path = Application;
+			sourceTree = "<group>";
+		};
+		D76F10E42DD528D500D87AB7 /* AssetsResource */ = {
+			isa = PBXGroup;
+			children = (
+				D7B548F32DCBDF190094BA51 /* Assets.xcassets */,
+			);
+			path = AssetsResource;
+			sourceTree = "<group>";
+		};
 		D7B548E62DCBDF190094BA51 /* Model */ = {
 			isa = PBXGroup;
 			children = (
 				D7B548E52DCBDF190094BA51 /* CoreDataModels.swift */,
 			);
 			path = Model;
-			sourceTree = "<group>";
-		};
-		D7B548EF2DCBDF190094BA51 /* View */ = {
-			isa = PBXGroup;
-			children = (
-				D7B548E72DCBDF190094BA51 /* AppointmentCardTableViewCell.swift */,
-				D7B548E82DCBDF190094BA51 /* AppointmentCardTableViewCell.xib */,
-				D7B548E92DCBDF190094BA51 /* EmployeeSelectionCollectionViewCell.swift */,
-				D7B548EB2DCBDF190094BA51 /* LaunchScreen.storyboard */,
-				D7B548ED2DCBDF190094BA51 /* Main.storyboard */,
-				D7B548EE2DCBDF190094BA51 /* ViewController.swift */,
-				D72531FA2DCCEC980048E613 /* AddAppointmentViewController.swift */,
-				D73E37482DD24EA6003EBA21 /* ServiceSelectionViewController.swift */,
-				D77B06662DD36786007B558B /* AddEmployeeAndServiceViewController.swift */,
-			);
-			path = View;
 			sourceTree = "<group>";
 		};
 		D7B548F12DCBDF190094BA51 /* View Model */ = {
@@ -221,15 +293,11 @@
 			isa = PBXGroup;
 			children = (
 				D72531FC2DCCFBBB0048E613 /* Utilities */,
-				D7B549062DCBDF1F0094BA51 /* DatabaseRepositories */,
-				D7B548E62DCBDF190094BA51 /* Model */,
-				D7B548EF2DCBDF190094BA51 /* View */,
-				D7B548F12DCBDF190094BA51 /* View Model */,
-				D7B548F22DCBDF190094BA51 /* AppDelegate.swift */,
-				D7B548F32DCBDF190094BA51 /* Assets.xcassets */,
-				D7B548F42DCBDF190094BA51 /* Final_Test_Project.xcdatamodeld */,
+				D76F10E42DD528D500D87AB7 /* AssetsResource */,
+				D76F10E02DD5284A00D87AB7 /* Backend */,
+				D76F10DC2DD5277A00D87AB7 /* Frontend */,
+				D76F10E32DD528BB00D87AB7 /* Application */,
 				D7B548F52DCBDF190094BA51 /* Info.plist */,
-				D7B548F62DCBDF190094BA51 /* SceneDelegate.swift */,
 			);
 			path = "Final Test Project";
 			sourceTree = "<group>";
@@ -237,7 +305,6 @@
 		D7B549062DCBDF1F0094BA51 /* DatabaseRepositories */ = {
 			isa = PBXGroup;
 			children = (
-				D76F10D82DD4E37A00D87AB7 /* NetworkManager.swift */,
 				D7B5490B2DCBE04A0094BA51 /* AppointmentRepository.swift */,
 				D7B549092DCBDFC60094BA51 /* EmployeeRepository.swift */,
 				D7B549072DCBDF510094BA51 /* ServiceRepository.swift */,
@@ -469,6 +536,7 @@
 				D7B548FD2DCBDF190094BA51 /* DefaultViewModel.swift in Sources */,
 				D76F10D22DD4D8D100D87AB7 /* AddApointmentViewModel.swift in Sources */,
 				D72531FE2DCCFBD40048E613 /* AppEnvironment.swift in Sources */,
+				D76F10DB2DD5232500D87AB7 /* Utilities.swift in Sources */,
 				D7B548FE2DCBDF190094BA51 /* AppDelegate.swift in Sources */,
 				D7B5490C2DCBE04C0094BA51 /* AppointmentRepository.swift in Sources */,
 				D7B548FF2DCBDF190094BA51 /* Final_Test_Project.xcdatamodeld in Sources */,
