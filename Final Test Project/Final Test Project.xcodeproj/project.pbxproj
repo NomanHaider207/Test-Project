@@ -17,6 +17,10 @@
 		D76F10D22DD4D8D100D87AB7 /* AddApointmentViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D76F10D12DD4D8C800D87AB7 /* AddApointmentViewModel.swift */; };
 		D76F10D92DD4E37A00D87AB7 /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D76F10D82DD4E37A00D87AB7 /* NetworkManager.swift */; };
 		D76F10DB2DD5232500D87AB7 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = D76F10DA2DD5232200D87AB7 /* Utilities.swift */; };
+		D772491B2DD601A800BD2E81 /* AddAppointmentViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D77249182DD601A800BD2E81 /* AddAppointmentViewModelTests.swift */; };
+		D772491C2DD601A800BD2E81 /* Final_Test_ProjectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D77249192DD601A800BD2E81 /* Final_Test_ProjectTests.swift */; };
+		D772491F2DD6020200BD2E81 /* MockNetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D772491E2DD6020200BD2E81 /* MockNetworkManager.swift */; };
+		D77249222DD6022600BD2E81 /* MockRepositories.swift in Sources */ = {isa = PBXBuildFile; fileRef = D77249212DD6022600BD2E81 /* MockRepositories.swift */; };
 		D77B06672DD36786007B558B /* AddEmployeeAndServiceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D77B06662DD36786007B558B /* AddEmployeeAndServiceViewController.swift */; };
 		D7B548F92DCBDF190094BA51 /* CoreDataModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7B548E52DCBDF190094BA51 /* CoreDataModels.swift */; };
 		D7B548FA2DCBDF190094BA51 /* AppointmentCardTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7B548E72DCBDF190094BA51 /* AppointmentCardTableViewCell.swift */; };
@@ -69,6 +73,10 @@
 		D76F10D12DD4D8C800D87AB7 /* AddApointmentViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddApointmentViewModel.swift; sourceTree = "<group>"; };
 		D76F10D82DD4E37A00D87AB7 /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
 		D76F10DA2DD5232200D87AB7 /* Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
+		D77249182DD601A800BD2E81 /* AddAppointmentViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddAppointmentViewModelTests.swift; sourceTree = "<group>"; };
+		D77249192DD601A800BD2E81 /* Final_Test_ProjectTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Final_Test_ProjectTests.swift; sourceTree = "<group>"; };
+		D772491E2DD6020200BD2E81 /* MockNetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockNetworkManager.swift; sourceTree = "<group>"; };
+		D77249212DD6022600BD2E81 /* MockRepositories.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockRepositories.swift; sourceTree = "<group>"; };
 		D77B06662DD36786007B558B /* AddEmployeeAndServiceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEmployeeAndServiceViewController.swift; sourceTree = "<group>"; };
 		D7B548E52DCBDF190094BA51 /* CoreDataModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataModels.swift; sourceTree = "<group>"; };
 		D7B548E72DCBDF190094BA51 /* AppointmentCardTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppointmentCardTableViewCell.swift; sourceTree = "<group>"; };
@@ -92,11 +100,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		D76C155C2DCB643B003EC626 /* Final Test ProjectTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = "Final Test ProjectTests";
-			sourceTree = "<group>";
-		};
 		D76C15662DCB643B003EC626 /* Final Test ProjectUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = "Final Test ProjectUITests";
@@ -169,7 +172,7 @@
 			isa = PBXGroup;
 			children = (
 				D7B548F72DCBDF190094BA51 /* Final Test Project */,
-				D76C155C2DCB643B003EC626 /* Final Test ProjectTests */,
+				D772491A2DD601A800BD2E81 /* Final Test ProjectTests */,
 				D76C15662DCB643B003EC626 /* Final Test ProjectUITests */,
 				D76C15412DCB6438003EC626 /* Products */,
 				C9F2317253D3700C8731FD3A /* Pods */,
@@ -272,6 +275,33 @@
 			path = AssetsResource;
 			sourceTree = "<group>";
 		};
+		D772491A2DD601A800BD2E81 /* Final Test ProjectTests */ = {
+			isa = PBXGroup;
+			children = (
+				D772491D2DD601AD00BD2E81 /* MockClasses */,
+				D77249182DD601A800BD2E81 /* AddAppointmentViewModelTests.swift */,
+				D77249192DD601A800BD2E81 /* Final_Test_ProjectTests.swift */,
+			);
+			path = "Final Test ProjectTests";
+			sourceTree = "<group>";
+		};
+		D772491D2DD601AD00BD2E81 /* MockClasses */ = {
+			isa = PBXGroup;
+			children = (
+				D77249202DD6021500BD2E81 /* DummyRepositories */,
+				D772491E2DD6020200BD2E81 /* MockNetworkManager.swift */,
+			);
+			path = MockClasses;
+			sourceTree = "<group>";
+		};
+		D77249202DD6021500BD2E81 /* DummyRepositories */ = {
+			isa = PBXGroup;
+			children = (
+				D77249212DD6022600BD2E81 /* MockRepositories.swift */,
+			);
+			path = DummyRepositories;
+			sourceTree = "<group>";
+		};
 		D7B548E62DCBDF190094BA51 /* Model */ = {
 			isa = PBXGroup;
 			children = (
@@ -346,9 +376,6 @@
 			);
 			dependencies = (
 				D76C155B2DCB643B003EC626 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				D76C155C2DCB643B003EC626 /* Final Test ProjectTests */,
 			);
 			name = "Final Test ProjectTests";
 			productName = "Final Test ProjectTests";
@@ -549,6 +576,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D772491F2DD6020200BD2E81 /* MockNetworkManager.swift in Sources */,
+				D772491B2DD601A800BD2E81 /* AddAppointmentViewModelTests.swift in Sources */,
+				D77249222DD6022600BD2E81 /* MockRepositories.swift in Sources */,
+				D772491C2DD601A800BD2E81 /* Final_Test_ProjectTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

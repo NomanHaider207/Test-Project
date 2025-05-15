@@ -18,13 +18,13 @@ class AddAppointmentViewModel {
     weak var delegate: AddApointmentViewModlDelegate?
     private var networkManager: NetworkManager?
     
-    private(set) var selectedEmployee: EmployeeModel?
-    private(set) var selectedServices: [ServiceModel] = []
-    private(set) var availableServicesForEmployee: [ServiceModel] = []
-    private(set) var startDate: Date?
-    private(set) var endDate: Date?
-    private(set) var clientName: String = ""
-    private(set) var employees: [EmployeeModel] = []
+    var selectedEmployee: EmployeeModel?
+    var selectedServices: [ServiceModel] = []
+    var availableServicesForEmployee: [ServiceModel] = []
+    var startDate: Date?
+    var endDate: Date?
+    var clientName: String = ""
+    var employees: [EmployeeModel] = []
     var selectedEmployeeId: UUID? = nil
     
     // MARK: - Init

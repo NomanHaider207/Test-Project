@@ -1,7 +1,7 @@
 import Foundation
 
 // MARK: - NetworkManager
-final class NetworkManager {
+class NetworkManager {
 
     private let appointmentRepo: AppointmentRepositoryProtocol
     private let employeeRepo: EmployeeRepositoryProtocol
