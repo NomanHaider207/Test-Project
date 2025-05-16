@@ -172,9 +172,10 @@ class AddAppointmentViewModel {
             employee: employeeEntity,
             services: serviceEntities
         )
-
+        
         switch result {
         case .success(let created):
+            print(created)
             return created
         case .failure(let error):
             delegate?.didFailWithError(error)
@@ -245,4 +246,5 @@ class AddAppointmentViewModel {
             return false
         }
     }
+    
 }

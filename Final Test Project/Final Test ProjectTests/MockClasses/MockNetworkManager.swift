@@ -33,7 +33,6 @@ final class MockNetworkManager: NetworkManager {
         self.shouldConflict = shouldConflict
         self.shouldFail = shouldFail
 
-        // We can inject dummy repos or use stubs for parent class init
         super.init(
             appointmentRepo: DummyAppointmentRepo(),
             employeeRepo: DummyEmployeeRepo(),

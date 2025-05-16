@@ -214,7 +214,6 @@ class AddAppointmentViewController: UIViewController {
     // MARK: - Appointment Logic
     private func createAppointment() {
         Task {
-            do {
                 let success = await viewModel.createAppointment(clientName: clientNameTextView.text ?? "")
                 if success {
                     await MainActor.run {
@@ -223,11 +222,6 @@ class AddAppointmentViewController: UIViewController {
                             self.dismiss(animated: true)
                         }
                     }
-                }
-            } catch {
-                await MainActor.run {
-                    Utilities.shared.showAlert(title: "Error", message: "Failed to create appointment: \(error.localizedDescription)")
-                }
             }
         }
     }

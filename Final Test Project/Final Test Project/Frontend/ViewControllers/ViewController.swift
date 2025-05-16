@@ -138,8 +138,7 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
         
         let appointment = viewModel.appointments[indexPath.section]
         
-        cell.configure(cell, at: indexPath.section, appointment: appointment)
-        cell.timeLabelTableViewCell.text = viewModel.formattedTime(for: appointment)
+        cell.configure(cell, at: indexPath.section, appointment: appointment, viewModel: viewModel)
         cell.delegate = self
         
         return cell

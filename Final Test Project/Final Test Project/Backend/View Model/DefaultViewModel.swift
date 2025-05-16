@@ -16,8 +16,8 @@ final class DefaultViewModel: ObservableObject {
     weak var delegate: ViewModelDelegate?
 
     // MARK: - Published Properties
-    @Published private(set) var appointments: [AppointmentModel] = []
-    @Published private(set) var employees: [EmployeeModel] = []
+    @Published var appointments: [AppointmentModel] = []
+    @Published var employees: [EmployeeModel] = []
     @Published var selectedDate: Date = Date() {
         didSet { filterAppointments() }
     }
@@ -26,7 +26,7 @@ final class DefaultViewModel: ObservableObject {
     }
 
     // MARK: - Private Properties
-    private(set) var allAppointments: [AppointmentModel] = []
+    var allAppointments: [AppointmentModel] = []
 
     // MARK: - Initializer
     init(networkManager: NetworkManager) {
@@ -83,12 +83,6 @@ final class DefaultViewModel: ObservableObject {
     }
     
     // MARK: - Appointment Formatting
-    func formatAppointmentTime(startTime: Date, endTime: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MMM d, h:mm a"
-        return "\(formatter.string(from: startTime)) - \(formatter.string(from: endTime))"
-    }
-    
     func formatServicesList(_ services: [ServiceModel]) -> String {
         return services.map { $0.title }.joined(separator: ", ")
     }
@@ -106,7 +100,7 @@ final class DefaultViewModel: ObservableObject {
     }
     
     // MARK: - Filter Appointments
-    private func filterAppointments() {
+    func filterAppointments() {
         let calendar = Calendar.current
         let startOfDay = calendar.startOfDay(for: selectedDate)
         guard let endOfDay = calendar.date(byAdding: .day, value: 1, to: startOfDay) else { return }
@@ -120,6 +114,8 @@ final class DefaultViewModel: ObservableObject {
     }
     
     func formattedTime(for appointment: AppointmentModel) -> String {
-            return formatAppointmentTime(startTime: appointment.startTime, endTime: appointment.endTime)
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM d, h:mm a"
+        return "\(formatter.string(from: appointment.startTime)) - \(formatter.string(from: appointment.endTime))"
     }
 }

@@ -63,11 +63,12 @@ class AppointmentCardTableViewCell: UITableViewCell {
     @IBAction func onOptionsButtonPressed(_ sender: UIButton) {
     }
     
-    func configure(_ cell: AppointmentCardTableViewCell, at section: Int, appointment: AppointmentModel) {
+    func configure(_ cell: AppointmentCardTableViewCell, at section: Int, appointment: AppointmentModel, viewModel: DefaultViewModel) {
         
         cell.employeeNameLabelTableViewCell.text = appointment.employee.name
         cell.clientNameTableViewCell.text = appointment.clientName
-        cell.serviceLabelTableViewCell.text = appointment.services.map { $0.title }.joined(separator: ", ")
+        cell.serviceLabelTableViewCell.text = viewModel.formatServicesList(appointment.services)
+        cell.timeLabelTableViewCell.text = viewModel.formattedTime(for: appointment)
     }
     
 }

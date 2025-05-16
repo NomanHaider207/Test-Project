@@ -21,6 +21,8 @@
 		D772491C2DD601A800BD2E81 /* Final_Test_ProjectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D77249192DD601A800BD2E81 /* Final_Test_ProjectTests.swift */; };
 		D772491F2DD6020200BD2E81 /* MockNetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D772491E2DD6020200BD2E81 /* MockNetworkManager.swift */; };
 		D77249222DD6022600BD2E81 /* MockRepositories.swift in Sources */ = {isa = PBXBuildFile; fileRef = D77249212DD6022600BD2E81 /* MockRepositories.swift */; };
+		D772495C2DD62D3300BD2E81 /* DefaultViewModelTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = D772495B2DD62D3300BD2E81 /* DefaultViewModelTest.swift */; };
+		D772495E2DD64E2F00BD2E81 /* MockAppointmentViewModelDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D772495D2DD64E2F00BD2E81 /* MockAppointmentViewModelDelegate.swift */; };
 		D77B06672DD36786007B558B /* AddEmployeeAndServiceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D77B06662DD36786007B558B /* AddEmployeeAndServiceViewController.swift */; };
 		D7B548F92DCBDF190094BA51 /* CoreDataModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7B548E52DCBDF190094BA51 /* CoreDataModels.swift */; };
 		D7B548FA2DCBDF190094BA51 /* AppointmentCardTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7B548E72DCBDF190094BA51 /* AppointmentCardTableViewCell.swift */; };
@@ -77,6 +79,8 @@
 		D77249192DD601A800BD2E81 /* Final_Test_ProjectTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Final_Test_ProjectTests.swift; sourceTree = "<group>"; };
 		D772491E2DD6020200BD2E81 /* MockNetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockNetworkManager.swift; sourceTree = "<group>"; };
 		D77249212DD6022600BD2E81 /* MockRepositories.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockRepositories.swift; sourceTree = "<group>"; };
+		D772495B2DD62D3300BD2E81 /* DefaultViewModelTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultViewModelTest.swift; sourceTree = "<group>"; };
+		D772495D2DD64E2F00BD2E81 /* MockAppointmentViewModelDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockAppointmentViewModelDelegate.swift; sourceTree = "<group>"; };
 		D77B06662DD36786007B558B /* AddEmployeeAndServiceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEmployeeAndServiceViewController.swift; sourceTree = "<group>"; };
 		D7B548E52DCBDF190094BA51 /* CoreDataModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataModels.swift; sourceTree = "<group>"; };
 		D7B548E72DCBDF190094BA51 /* AppointmentCardTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppointmentCardTableViewCell.swift; sourceTree = "<group>"; };
@@ -280,6 +284,7 @@
 			children = (
 				D772491D2DD601AD00BD2E81 /* MockClasses */,
 				D77249182DD601A800BD2E81 /* AddAppointmentViewModelTests.swift */,
+				D772495B2DD62D3300BD2E81 /* DefaultViewModelTest.swift */,
 				D77249192DD601A800BD2E81 /* Final_Test_ProjectTests.swift */,
 			);
 			path = "Final Test ProjectTests";
@@ -288,6 +293,7 @@
 		D772491D2DD601AD00BD2E81 /* MockClasses */ = {
 			isa = PBXGroup;
 			children = (
+				D772495D2DD64E2F00BD2E81 /* MockAppointmentViewModelDelegate.swift */,
 				D77249202DD6021500BD2E81 /* DummyRepositories */,
 				D772491E2DD6020200BD2E81 /* MockNetworkManager.swift */,
 			);
@@ -577,7 +583,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				D772491F2DD6020200BD2E81 /* MockNetworkManager.swift in Sources */,
+				D772495C2DD62D3300BD2E81 /* DefaultViewModelTest.swift in Sources */,
 				D772491B2DD601A800BD2E81 /* AddAppointmentViewModelTests.swift in Sources */,
+				D772495E2DD64E2F00BD2E81 /* MockAppointmentViewModelDelegate.swift in Sources */,
 				D77249222DD6022600BD2E81 /* MockRepositories.swift in Sources */,
 				D772491C2DD601A800BD2E81 /* Final_Test_ProjectTests.swift in Sources */,
 			);

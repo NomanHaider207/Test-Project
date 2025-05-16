@@ -16,6 +16,7 @@ final class AddAppointmentViewModelTests: XCTestCase {
         super.tearDown()
     }
 
+    // MARK: - Test Cases of function selectEmployee(at: index) to check all condition
     func testSelectEmployeeUpdatesSelectedEmployeeAndId() {
         let employee = EmployeeModel(id: UUID(), name: "Noman", services: [])
         viewModel.employees = [employee]
@@ -38,6 +39,7 @@ final class AddAppointmentViewModelTests: XCTestCase {
         XCTAssertNil(viewModel.selectedEmployeeId)
     }
     
+    // MARK: - Test Cases of function updateStartTime(date) to check all condition
     func testUpdateStartTime(){
         let date = Date()
         
@@ -55,6 +57,7 @@ final class AddAppointmentViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.endDate, date)
     }
     
+    // MARK: - Test Cases of function canSetEndTime() to check all condition
     func testCanSetEndTimeOnlyIfAfterStart() {
         let start = Date()
         let validEnd = start.addingTimeInterval(3600)
@@ -80,6 +83,7 @@ final class AddAppointmentViewModelTests: XCTestCase {
         XCTAssertFalse(viewModel.validateTimeRange())
     }
     
+    // MARK: - Test Cases of function validateUserName() to check all condition
     func testValidateUserName(){
         let validName: String = "Noman Haider"
         let invalidName: String = "Noman 123"
@@ -88,6 +92,7 @@ final class AddAppointmentViewModelTests: XCTestCase {
         XCTAssertFalse(viewModel.validateName(invalidName))
     }
     
+    // MARK: - Test Cases of function selectSetvices() to check all condition
     func testCanSelectServcies() {
         viewModel.selectedEmployee = EmployeeModel(id: UUID(), name: "Noman", services: [])
         XCTAssertTrue(viewModel.canSelectServices())
@@ -107,6 +112,7 @@ final class AddAppointmentViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.selectedServices.first?.title, "Haircut")
     }
     
+    // MARK: - Test Cases of function populateDataInFieldsForEditing to check all condition
     func testPopulateDataForEditing(){
         let startDate = Date()
         let endDate = startDate.addingTimeInterval(2*60*60)
@@ -125,6 +131,7 @@ final class AddAppointmentViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.selectedServices.count, 2)
     }
     
+    // MARK: - Test Cases of function updateStartTime to check all condition
     func testFormattedStartTimeReturnsCorrectString() {
         let date = Date(timeIntervalSince1970: 1_694_000_000) 
         viewModel.updateStartTime(date)
@@ -139,6 +146,84 @@ final class AddAppointmentViewModelTests: XCTestCase {
 
         let formatted = viewModel.formattedEndTime
         XCTAssertFalse(formatted.isEmpty)
+    }
+    
+    
+    // MARK: - Test Cases of function createAppointment method to check all condition using mock repos
+    func testAddAppointmentSuccess() async {
+        
+        let employeeId = UUID()
+        let serviceId = UUID()
+        let mockManager = MockNetworkManager()
+
+        let viewModel = AddAppointmentViewModel(networkManager: mockManager)
+
+        let employee = EmployeeModel(id: employeeId, name: "John", services: [])
+        let service = ServiceModel(id: serviceId, title: "Haircut")
+        let startTime = Date()
+        let endTime = Calendar.current.date(byAdding: .hour, value: 2, to: startTime)!
+
+        viewModel.clientName = "Noman"
+        viewModel.selectedEmployee = employee
+        viewModel.selectedServices = [service]
+        viewModel.startDate = startTime
+        viewModel.endDate = endTime
+
+        Task{
+            let result = await viewModel.createAppointment(clientName: "Noman")
+            XCTAssertTrue(result)
+        }
+
+    }
+   
+    func testAddAppointmentFail() async {
+        
+        let employeeId = UUID()
+        let serviceId = UUID()
+        let mockManager = MockNetworkManager(shouldFail: true)
+
+        let viewModel = AddAppointmentViewModel(networkManager: mockManager)
+
+        let employee = EmployeeModel(id: employeeId, name: "John", services: [])
+        let service = ServiceModel(id: serviceId, title: "Haircut")
+        let startTime = Date()
+        let endTime = Calendar.current.date(byAdding: .hour, value: 2, to: startTime)!
+
+        viewModel.clientName = "Noman"
+        viewModel.selectedEmployee = employee
+        viewModel.selectedServices = [service]
+        viewModel.startDate = startTime
+        viewModel.endDate = endTime
+
+        Task{
+            let result = await viewModel.createAppointment(clientName: "Noman")
+            XCTAssertFalse(result)
+        }
+    }
+    
+    func testAddAppointmentHaveConflict() async {
+        
+        let employeeId = UUID()
+        let serviceId = UUID()
+        let mockManager = MockNetworkManager(shouldConflict: true)
+
+        let viewModel = AddAppointmentViewModel(networkManager: mockManager)
+
+        let employee = EmployeeModel(id: employeeId, name: "John", services: [])
+        let service = ServiceModel(id: serviceId, title: "Haircut")
+        let startTime = Date()
+        let endTime = Calendar.current.date(byAdding: .hour, value: 2, to: startTime)!
+
+        viewModel.clientName = "Noman"
+        viewModel.selectedEmployee = employee
+        viewModel.selectedServices = [service]
+        viewModel.startDate = startTime
+        viewModel.endDate = endTime
+
+        Task{
+            let result = await viewModel.createAppointment(clientName: "Noman")
+            XCTAssertFalse(result)
+        }
     }
 
     
