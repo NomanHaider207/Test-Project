@@ -9,7 +9,7 @@
 import Foundation
 @testable import Final_Test_Project
 
-final class MockNetworkManager: NetworkManager {
+final class MockNetworkManager: RepositoryManager {
     
     private let mockEmployeeModels: [EmployeeModel]
     private let mockServiceModels: [ServiceModel]

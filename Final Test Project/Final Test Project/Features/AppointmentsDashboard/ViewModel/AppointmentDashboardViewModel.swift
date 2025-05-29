@@ -9,15 +9,16 @@ protocol ViewModelDelegate: AnyObject {
 }
 
 @MainActor
-final class DefaultViewModel: ObservableObject {
+final class AppointmentDashboardViewModel: ObservableObject {
 
     // MARK: - Dependencies
-    private let networkManager: NetworkManager
+    private let networkManager: RepositoryManager
     weak var delegate: ViewModelDelegate?
+    var screenMode: ScreenMode = .addAppointment
 
     // MARK: - Published Properties
-    @Published var appointments: [AppointmentModel] = []
-    @Published var employees: [EmployeeModel] = []
+    @Published var appointments: [Appointments] = []
+    @Published var employees: [Employees] = []
     @Published var selectedDate: Date = Date() {
         didSet { filterAppointments() }
     }
@@ -26,10 +27,10 @@ final class DefaultViewModel: ObservableObject {
     }
 
     // MARK: - Private Properties
-    var allAppointments: [AppointmentModel] = []
+    var allAppointments: [Appointments] = []
 
     // MARK: - Initializer
-    init(networkManager: NetworkManager) {
+    init(networkManager: RepositoryManager) {
         self.networkManager = networkManager
     }
 
@@ -38,30 +39,32 @@ final class DefaultViewModel: ObservableObject {
         let result = await networkManager.getEmployees()
         switch result {
         case .success(let employees):
-            let allOption = EmployeeModel(id: UUID(), name: "All", services: [])
-            self.employees = [allOption] + employees
-            delegate?.didUpdateData()
+            self.employees = employees
         case .failure(let error):
             delegate?.didFailWithError(error)
         }
     }
 
     func loadAppointments() async {
-        let result = await networkManager.getAppointments()
+        let result = await networkManager.getAllAppointments()
         switch result {
         case .success(let appointments):
             self.allAppointments = appointments
             filterAppointments()
-            delegate?.didUpdateData()
         case .failure(let error):
             delegate?.didFailWithError(error)
         }
+    }
+    
+    
+    func creatDummyData() async {
+        await networkManager.creatDummyData()
     }
 
     // MARK: - Delete
     func deleteAppointment(_ id: UUID) async {
         guard let appointmentEntity = await fetchAppointmentById(id) else { return }
-        let result = await networkManager.removeAppointment(appointmentEntity)
+        let result = await networkManager.deleteAppointment(appointmentEntity)
         switch result {
         case .success:
             await loadAppointments()
@@ -69,10 +72,10 @@ final class DefaultViewModel: ObservableObject {
             delegate?.didFailWithError(error)
         }
     }
-
+    
     // MARK: - Fetch by ID
-    func fetchAppointmentById(_ id: UUID) async -> Appointmemts? {
-        let result = await networkManager.getAppointment(by: id)
+    func fetchAppointmentById(_ id: UUID) async -> Appointments? {
+        let result = await networkManager.getAppointmentById(by: id)
         switch result {
         case .success(let appointment):
             return appointment
@@ -83,8 +86,8 @@ final class DefaultViewModel: ObservableObject {
     }
     
     // MARK: - Appointment Formatting
-    func formatServicesList(_ services: [ServiceModel]) -> String {
-        return services.map { $0.title }.joined(separator: ", ")
+    func formatServicesList(_ services: [Services]) -> String {
+        return services.compactMap { $0.title }.joined(separator: ", ")
     }
     
     // MARK: - Employee Selection
@@ -104,18 +107,43 @@ final class DefaultViewModel: ObservableObject {
         let calendar = Calendar.current
         let startOfDay = calendar.startOfDay(for: selectedDate)
         guard let endOfDay = calendar.date(byAdding: .day, value: 1, to: startOfDay) else { return }
-
         self.appointments = allAppointments.filter { appointment in
-            let overlaps = appointment.startTime < endOfDay && appointment.endTime >= startOfDay
-            let matchesEmployee = selectedEmployeeId == nil || appointment.employee.id == selectedEmployeeId
+            guard let startTime = appointment.startTime,
+                  let endTime = appointment.endTime
+            
+            else {
+                print("""
+                    [Filter Check] - Appointment: \(appointment.clientName ?? "Unknown")
+                    Start: \(String(describing: appointment.startTime)), End: \(String(describing: appointment.endTime))
+                """)
+                return false
+            }
+
+            let overlaps = startTime < endOfDay && endTime >= startOfDay
+            let matchesEmployee = selectedEmployeeId == nil || appointment.employee?.id == selectedEmployeeId
+
+            print("""
+                [Filter Check] - Appointment: \(appointment.clientName ?? "Unknown")
+                Start: \(startTime), End: \(endTime)
+                Overlaps: \(overlaps), Matches Employee: \(matchesEmployee)
+            """)
+
             return overlaps && matchesEmployee
         }
+        print("[Appointment Dashboard] - [Appointments Arrays] - \(appointments)")
         delegate?.didUpdateData()
     }
+
     
-    func formattedTime(for appointment: AppointmentModel) -> String {
+    func formattedTime(for appointment: Appointments) -> String {
+        guard let start = appointment.startTime,
+              let end = appointment.endTime else {
+            return "Invalid time"
+        }
+        
         let formatter = DateFormatter()
         formatter.dateFormat = "MMM d, h:mm a"
-        return "\(formatter.string(from: appointment.startTime)) - \(formatter.string(from: appointment.endTime))"
+        return "\(formatter.string(from: start)) - \(formatter.string(from: end))"
     }
+
 }

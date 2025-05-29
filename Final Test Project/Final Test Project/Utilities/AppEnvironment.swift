@@ -14,15 +14,14 @@ final class AppEnvironment {
         return AppEnvironment()
     }()
     
-    let networkManger: NetworkManager
+    let networkManger: RepositoryManager
 
     @MainActor
     private init() {
-        let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-        let appointmentRepo = DefaultAppointmentRepository(context: context)
-        let employeeRepo = DefaultEmployeeRepository(context: context)
-        let servicesRepo = DefaultServiceRepository(context: context)
-        self.networkManger = NetworkManager(appointmentRepo: appointmentRepo, employeeRepo: employeeRepo, serviceRepo: servicesRepo)
+        let appointmentRepo = DefaultAppointmentRepository()
+        let employeeRepo = DefaultEmployeeRepository()
+        let servicesRepo = DefaultServiceRepository()
+        self.networkManger = RepositoryManager(appointmentRepo: appointmentRepo, employeeRepo: employeeRepo, serviceRepo: servicesRepo)
     }
 }
 

@@ -4,11 +4,11 @@ import XCTest
 @MainActor
 final class AddAppointmentViewModelTests: XCTestCase {
     
-    var viewModel: AddAppointmentViewModel!
+    var viewModel: AppointmentFormViewModel!
 
     override func setUp() {
         super.setUp()
-        viewModel = AddAppointmentViewModel(networkManager: MockNetworkManager())
+        viewModel = AppointmentFormViewModel(networkManager: MockNetworkManager())
     }
 
     override func tearDown() {
@@ -156,7 +156,7 @@ final class AddAppointmentViewModelTests: XCTestCase {
         let serviceId = UUID()
         let mockManager = MockNetworkManager()
 
-        let viewModel = AddAppointmentViewModel(networkManager: mockManager)
+        let viewModel = AppointmentFormViewModel(networkManager: mockManager)
 
         let employee = EmployeeModel(id: employeeId, name: "John", services: [])
         let service = ServiceModel(id: serviceId, title: "Haircut")
@@ -182,7 +182,7 @@ final class AddAppointmentViewModelTests: XCTestCase {
         let serviceId = UUID()
         let mockManager = MockNetworkManager(shouldFail: true)
 
-        let viewModel = AddAppointmentViewModel(networkManager: mockManager)
+        let viewModel = AppointmentFormViewModel(networkManager: mockManager)
 
         let employee = EmployeeModel(id: employeeId, name: "John", services: [])
         let service = ServiceModel(id: serviceId, title: "Haircut")
@@ -207,7 +207,7 @@ final class AddAppointmentViewModelTests: XCTestCase {
         let serviceId = UUID()
         let mockManager = MockNetworkManager(shouldConflict: true)
 
-        let viewModel = AddAppointmentViewModel(networkManager: mockManager)
+        let viewModel = AppointmentFormViewModel(networkManager: mockManager)
 
         let employee = EmployeeModel(id: employeeId, name: "John", services: [])
         let service = ServiceModel(id: serviceId, title: "Haircut")

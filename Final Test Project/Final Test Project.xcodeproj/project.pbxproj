@@ -10,12 +10,18 @@
 		048903F036B4EB8476CD2EC0 /* Pods_Final_Test_Project_Final_Test_ProjectUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3A3E564FEF55F7761F25E848 /* Pods_Final_Test_Project_Final_Test_ProjectUITests.framework */; };
 		51AD0F98D44064220B202BE5 /* Pods_Final_Test_ProjectTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E564BA14E9833609408AC5E7 /* Pods_Final_Test_ProjectTests.framework */; };
 		53B79FF06AA72C658A6F732B /* Pods_Final_Test_Project.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 77650971E215FC44615B9F0E /* Pods_Final_Test_Project.framework */; };
-		D72531FB2DCCEC980048E613 /* AddAppointmentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D72531FA2DCCEC980048E613 /* AddAppointmentViewController.swift */; };
+		D71F2F412DE7409500B1526F /* RepositoryErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = D71F2F402DE7409500B1526F /* RepositoryErrors.swift */; };
+		D72531FB2DCCEC980048E613 /* AppointmentFormViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D72531FA2DCCEC980048E613 /* AppointmentFormViewController.swift */; };
 		D72531FE2DCCFBD40048E613 /* AppEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = D72531FD2DCCFBD40048E613 /* AppEnvironment.swift */; };
+		D72F95372DE63EF100475484 /* ServiceRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = D72F95352DE63EF100475484 /* ServiceRepository.swift */; };
+		D72F95382DE63EF100475484 /* EmployeeRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = D72F95342DE63EF100475484 /* EmployeeRepository.swift */; };
+		D72F953B2DE6401100475484 /* CoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D72F953A2DE6401100475484 /* CoreDataManager.swift */; };
+		D72F953E2DE6502000475484 /* CoreDataModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D72F953C2DE6502000475484 /* CoreDataModels.swift */; };
 		D73E37492DD24EA6003EBA21 /* ServiceSelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D73E37482DD24EA6003EBA21 /* ServiceSelectionViewController.swift */; };
+		D76E1B312DE639A9006265C1 /* AppointmentRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = D76E1B302DE639A9006265C1 /* AppointmentRepository.swift */; };
 		D76F10D02DD4C0F800D87AB7 /* Validator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D76F10CF2DD4C0F300D87AB7 /* Validator.swift */; };
-		D76F10D22DD4D8D100D87AB7 /* AddApointmentViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D76F10D12DD4D8C800D87AB7 /* AddApointmentViewModel.swift */; };
-		D76F10D92DD4E37A00D87AB7 /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D76F10D82DD4E37A00D87AB7 /* NetworkManager.swift */; };
+		D76F10D22DD4D8D100D87AB7 /* ApointmentFormViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D76F10D12DD4D8C800D87AB7 /* ApointmentFormViewModel.swift */; };
+		D76F10D92DD4E37A00D87AB7 /* RepositoryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D76F10D82DD4E37A00D87AB7 /* RepositoryManager.swift */; };
 		D76F10DB2DD5232500D87AB7 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = D76F10DA2DD5232200D87AB7 /* Utilities.swift */; };
 		D772491B2DD601A800BD2E81 /* AddAppointmentViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D77249182DD601A800BD2E81 /* AddAppointmentViewModelTests.swift */; };
 		D772491C2DD601A800BD2E81 /* Final_Test_ProjectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D77249192DD601A800BD2E81 /* Final_Test_ProjectTests.swift */; };
@@ -23,12 +29,10 @@
 		D77249222DD6022600BD2E81 /* MockRepositories.swift in Sources */ = {isa = PBXBuildFile; fileRef = D77249212DD6022600BD2E81 /* MockRepositories.swift */; };
 		D772495C2DD62D3300BD2E81 /* DefaultViewModelTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = D772495B2DD62D3300BD2E81 /* DefaultViewModelTest.swift */; };
 		D772495E2DD64E2F00BD2E81 /* MockAppointmentViewModelDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D772495D2DD64E2F00BD2E81 /* MockAppointmentViewModelDelegate.swift */; };
-		D77B06672DD36786007B558B /* AddEmployeeAndServiceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D77B06662DD36786007B558B /* AddEmployeeAndServiceViewController.swift */; };
-		D7B548F92DCBDF190094BA51 /* CoreDataModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7B548E52DCBDF190094BA51 /* CoreDataModels.swift */; };
 		D7B548FA2DCBDF190094BA51 /* AppointmentCardTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7B548E72DCBDF190094BA51 /* AppointmentCardTableViewCell.swift */; };
 		D7B548FB2DCBDF190094BA51 /* EmployeeSelectionCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7B548E92DCBDF190094BA51 /* EmployeeSelectionCollectionViewCell.swift */; };
-		D7B548FC2DCBDF190094BA51 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7B548EE2DCBDF190094BA51 /* ViewController.swift */; };
-		D7B548FD2DCBDF190094BA51 /* DefaultViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7B548F02DCBDF190094BA51 /* DefaultViewModel.swift */; };
+		D7B548FC2DCBDF190094BA51 /* AppointmentDashboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7B548EE2DCBDF190094BA51 /* AppointmentDashboardViewController.swift */; };
+		D7B548FD2DCBDF190094BA51 /* AppointmentDashboardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7B548F02DCBDF190094BA51 /* AppointmentDashboardViewModel.swift */; };
 		D7B548FE2DCBDF190094BA51 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7B548F22DCBDF190094BA51 /* AppDelegate.swift */; };
 		D7B548FF2DCBDF190094BA51 /* Final_Test_Project.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = D7B548F42DCBDF190094BA51 /* Final_Test_Project.xcdatamodeld */; };
 		D7B549002DCBDF190094BA51 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7B548F62DCBDF190094BA51 /* SceneDelegate.swift */; };
@@ -36,9 +40,6 @@
 		D7B549022DCBDF190094BA51 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D7B548EB2DCBDF190094BA51 /* LaunchScreen.storyboard */; };
 		D7B549032DCBDF190094BA51 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D7B548ED2DCBDF190094BA51 /* Main.storyboard */; };
 		D7B549042DCBDF190094BA51 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D7B548F32DCBDF190094BA51 /* Assets.xcassets */; };
-		D7B549082DCBDF510094BA51 /* ServiceRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7B549072DCBDF510094BA51 /* ServiceRepository.swift */; };
-		D7B5490A2DCBDFDA0094BA51 /* EmployeeRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7B549092DCBDFC60094BA51 /* EmployeeRepository.swift */; };
-		D7B5490C2DCBE04C0094BA51 /* AppointmentRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7B5490B2DCBE04A0094BA51 /* AppointmentRepository.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -65,15 +66,21 @@
 		77650971E215FC44615B9F0E /* Pods_Final_Test_Project.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Final_Test_Project.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		849143BFDE68353BA60ABB02 /* Pods-Final Test Project-Final Test ProjectUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Final Test Project-Final Test ProjectUITests.release.xcconfig"; path = "Target Support Files/Pods-Final Test Project-Final Test ProjectUITests/Pods-Final Test Project-Final Test ProjectUITests.release.xcconfig"; sourceTree = "<group>"; };
 		AB2678121274D1DEDFC5EA7A /* Pods-Final Test ProjectTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Final Test ProjectTests.debug.xcconfig"; path = "Target Support Files/Pods-Final Test ProjectTests/Pods-Final Test ProjectTests.debug.xcconfig"; sourceTree = "<group>"; };
-		D72531FA2DCCEC980048E613 /* AddAppointmentViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddAppointmentViewController.swift; sourceTree = "<group>"; };
+		D71F2F402DE7409500B1526F /* RepositoryErrors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepositoryErrors.swift; sourceTree = "<group>"; };
+		D72531FA2DCCEC980048E613 /* AppointmentFormViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppointmentFormViewController.swift; sourceTree = "<group>"; };
 		D72531FD2DCCFBD40048E613 /* AppEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppEnvironment.swift; sourceTree = "<group>"; };
+		D72F95342DE63EF100475484 /* EmployeeRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmployeeRepository.swift; sourceTree = "<group>"; };
+		D72F95352DE63EF100475484 /* ServiceRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceRepository.swift; sourceTree = "<group>"; };
+		D72F953A2DE6401100475484 /* CoreDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataManager.swift; sourceTree = "<group>"; };
+		D72F953C2DE6502000475484 /* CoreDataModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataModels.swift; sourceTree = "<group>"; };
 		D73E37482DD24EA6003EBA21 /* ServiceSelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceSelectionViewController.swift; sourceTree = "<group>"; };
 		D76C15402DCB6438003EC626 /* Final Test Project.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Final Test Project.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D76C15592DCB643B003EC626 /* Final Test ProjectTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Final Test ProjectTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D76C15632DCB643B003EC626 /* Final Test ProjectUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Final Test ProjectUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		D76E1B302DE639A9006265C1 /* AppointmentRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppointmentRepository.swift; sourceTree = "<group>"; };
 		D76F10CF2DD4C0F300D87AB7 /* Validator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Validator.swift; sourceTree = "<group>"; };
-		D76F10D12DD4D8C800D87AB7 /* AddApointmentViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddApointmentViewModel.swift; sourceTree = "<group>"; };
-		D76F10D82DD4E37A00D87AB7 /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
+		D76F10D12DD4D8C800D87AB7 /* ApointmentFormViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApointmentFormViewModel.swift; sourceTree = "<group>"; };
+		D76F10D82DD4E37A00D87AB7 /* RepositoryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepositoryManager.swift; sourceTree = "<group>"; };
 		D76F10DA2DD5232200D87AB7 /* Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
 		D77249182DD601A800BD2E81 /* AddAppointmentViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddAppointmentViewModelTests.swift; sourceTree = "<group>"; };
 		D77249192DD601A800BD2E81 /* Final_Test_ProjectTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Final_Test_ProjectTests.swift; sourceTree = "<group>"; };
@@ -81,23 +88,18 @@
 		D77249212DD6022600BD2E81 /* MockRepositories.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockRepositories.swift; sourceTree = "<group>"; };
 		D772495B2DD62D3300BD2E81 /* DefaultViewModelTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultViewModelTest.swift; sourceTree = "<group>"; };
 		D772495D2DD64E2F00BD2E81 /* MockAppointmentViewModelDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockAppointmentViewModelDelegate.swift; sourceTree = "<group>"; };
-		D77B06662DD36786007B558B /* AddEmployeeAndServiceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEmployeeAndServiceViewController.swift; sourceTree = "<group>"; };
-		D7B548E52DCBDF190094BA51 /* CoreDataModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataModels.swift; sourceTree = "<group>"; };
 		D7B548E72DCBDF190094BA51 /* AppointmentCardTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppointmentCardTableViewCell.swift; sourceTree = "<group>"; };
 		D7B548E82DCBDF190094BA51 /* AppointmentCardTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AppointmentCardTableViewCell.xib; sourceTree = "<group>"; };
 		D7B548E92DCBDF190094BA51 /* EmployeeSelectionCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmployeeSelectionCollectionViewCell.swift; sourceTree = "<group>"; };
 		D7B548EA2DCBDF190094BA51 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		D7B548EC2DCBDF190094BA51 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		D7B548EE2DCBDF190094BA51 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		D7B548F02DCBDF190094BA51 /* DefaultViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultViewModel.swift; sourceTree = "<group>"; };
+		D7B548EE2DCBDF190094BA51 /* AppointmentDashboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppointmentDashboardViewController.swift; sourceTree = "<group>"; };
+		D7B548F02DCBDF190094BA51 /* AppointmentDashboardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppointmentDashboardViewModel.swift; sourceTree = "<group>"; };
 		D7B548F22DCBDF190094BA51 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D7B548F32DCBDF190094BA51 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D7B548F52DCBDF190094BA51 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D7B548F62DCBDF190094BA51 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		D7B548F82DCBDF190094BA51 /* Final_Test_Project.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Final_Test_Project.xcdatamodel; sourceTree = "<group>"; };
-		D7B549072DCBDF510094BA51 /* ServiceRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceRepository.swift; sourceTree = "<group>"; };
-		D7B549092DCBDFC60094BA51 /* EmployeeRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmployeeRepository.swift; sourceTree = "<group>"; };
-		D7B5490B2DCBE04A0094BA51 /* AppointmentRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppointmentRepository.swift; sourceTree = "<group>"; };
 		E564BA14E9833609408AC5E7 /* Pods_Final_Test_ProjectTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Final_Test_ProjectTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F224EE4CCC60C70D0B1DDF07 /* Pods-Final Test Project.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Final Test Project.release.xcconfig"; path = "Target Support Files/Pods-Final Test Project/Pods-Final Test Project.release.xcconfig"; sourceTree = "<group>"; };
 		FDA2BE2D93A9C4611A723E81 /* Pods-Final Test ProjectTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Final Test ProjectTests.release.xcconfig"; path = "Target Support Files/Pods-Final Test ProjectTests/Pods-Final Test ProjectTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -162,14 +164,59 @@
 			path = Pods;
 			sourceTree = "<group>";
 		};
+		D71F2F3F2DE7408100B1526F /* Errors */ = {
+			isa = PBXGroup;
+			children = (
+				D71F2F402DE7409500B1526F /* RepositoryErrors.swift */,
+			);
+			path = Errors;
+			sourceTree = "<group>";
+		};
 		D72531FC2DCCFBBB0048E613 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				D71F2F3F2DE7408100B1526F /* Errors */,
 				D76F10DA2DD5232200D87AB7 /* Utilities.swift */,
 				D76F10CF2DD4C0F300D87AB7 /* Validator.swift */,
 				D72531FD2DCCFBD40048E613 /* AppEnvironment.swift */,
 			);
 			path = Utilities;
+			sourceTree = "<group>";
+		};
+		D72F95362DE63EF100475484 /* DatabaseRepositories */ = {
+			isa = PBXGroup;
+			children = (
+				D76E1B302DE639A9006265C1 /* AppointmentRepository.swift */,
+				D72F95342DE63EF100475484 /* EmployeeRepository.swift */,
+				D72F95352DE63EF100475484 /* ServiceRepository.swift */,
+			);
+			path = DatabaseRepositories;
+			sourceTree = "<group>";
+		};
+		D72F953D2DE6502000475484 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				D72F953C2DE6502000475484 /* CoreDataModels.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		D736F2F72DE875AE003A77C6 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				D7B548F42DCBDF190094BA51 /* Final_Test_Project.xcdatamodeld */,
+				D72F953A2DE6401100475484 /* CoreDataManager.swift */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		D736F2F82DE875DD003A77C6 /* Domain */ = {
+			isa = PBXGroup;
+			children = (
+				D72F953D2DE6502000475484 /* Model */,
+				D72F95362DE63EF100475484 /* DatabaseRepositories */,
+			);
+			path = Domain;
 			sourceTree = "<group>";
 		};
 		D76C15372DCB6438003EC626 = {
@@ -194,72 +241,85 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		D76F10DC2DD5277A00D87AB7 /* Frontend */ = {
+		D76E1B272DE6310C006265C1 /* Features */ = {
 			isa = PBXGroup;
 			children = (
-				D76F10DF2DD527D000D87AB7 /* Cells */,
-				D76F10DE2DD527B500D87AB7 /* Storyboards */,
-				D76F10DD2DD5279600D87AB7 /* ViewControllers */,
+				D76E1B282DE63118006265C1 /* AppointmentsDashboard */,
+				D76E1B2B2DE635E5006265C1 /* AddAppointment */,
 			);
-			path = Frontend;
+			path = Features;
 			sourceTree = "<group>";
 		};
-		D76F10DD2DD5279600D87AB7 /* ViewControllers */ = {
+		D76E1B282DE63118006265C1 /* AppointmentsDashboard */ = {
 			isa = PBXGroup;
 			children = (
-				D72531FA2DCCEC980048E613 /* AddAppointmentViewController.swift */,
-				D7B548EE2DCBDF190094BA51 /* ViewController.swift */,
-				D77B06662DD36786007B558B /* AddEmployeeAndServiceViewController.swift */,
+				D76E1B292DE6325F006265C1 /* View */,
+				D76E1B2A2DE63266006265C1 /* ViewModel */,
+			);
+			path = AppointmentsDashboard;
+			sourceTree = "<group>";
+		};
+		D76E1B292DE6325F006265C1 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				D76E1B2F2DE636AE006265C1 /* Modifiers */,
+				D7B548EB2DCBDF190094BA51 /* LaunchScreen.storyboard */,
+				D7B548ED2DCBDF190094BA51 /* Main.storyboard */,
+				D7B548EE2DCBDF190094BA51 /* AppointmentDashboardViewController.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		D76E1B2A2DE63266006265C1 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				D7B548F02DCBDF190094BA51 /* AppointmentDashboardViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		D76E1B2B2DE635E5006265C1 /* AddAppointment */ = {
+			isa = PBXGroup;
+			children = (
+				D76E1B2E2DE63602006265C1 /* ViewModel */,
+				D76E1B2C2DE635EF006265C1 /* View */,
+			);
+			path = AddAppointment;
+			sourceTree = "<group>";
+		};
+		D76E1B2C2DE635EF006265C1 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				D72531FA2DCCEC980048E613 /* AppointmentFormViewController.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		D76E1B2E2DE63602006265C1 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				D76F10D12DD4D8C800D87AB7 /* ApointmentFormViewModel.swift */,
 				D73E37482DD24EA6003EBA21 /* ServiceSelectionViewController.swift */,
 			);
-			path = ViewControllers;
+			path = ViewModel;
 			sourceTree = "<group>";
 		};
-		D76F10DE2DD527B500D87AB7 /* Storyboards */ = {
-			isa = PBXGroup;
-			children = (
-				D7B548ED2DCBDF190094BA51 /* Main.storyboard */,
-				D7B548EB2DCBDF190094BA51 /* LaunchScreen.storyboard */,
-			);
-			path = Storyboards;
-			sourceTree = "<group>";
-		};
-		D76F10DF2DD527D000D87AB7 /* Cells */ = {
+		D76E1B2F2DE636AE006265C1 /* Modifiers */ = {
 			isa = PBXGroup;
 			children = (
 				D7B548E72DCBDF190094BA51 /* AppointmentCardTableViewCell.swift */,
 				D7B548E82DCBDF190094BA51 /* AppointmentCardTableViewCell.xib */,
 				D7B548E92DCBDF190094BA51 /* EmployeeSelectionCollectionViewCell.swift */,
 			);
-			path = Cells;
+			path = Modifiers;
 			sourceTree = "<group>";
 		};
-		D76F10E02DD5284A00D87AB7 /* Backend */ = {
+		D76F10E02DD5284A00D87AB7 /* Services */ = {
 			isa = PBXGroup;
 			children = (
-				D76F10E22DD5288600D87AB7 /* Managers */,
-				D76F10E12DD5287900D87AB7 /* Database */,
-				D7B548E62DCBDF190094BA51 /* Model */,
-				D7B548F12DCBDF190094BA51 /* View Model */,
+				D76F10D82DD4E37A00D87AB7 /* RepositoryManager.swift */,
 			);
-			path = Backend;
-			sourceTree = "<group>";
-		};
-		D76F10E12DD5287900D87AB7 /* Database */ = {
-			isa = PBXGroup;
-			children = (
-				D7B548F42DCBDF190094BA51 /* Final_Test_Project.xcdatamodeld */,
-				D7B549062DCBDF1F0094BA51 /* DatabaseRepositories */,
-			);
-			path = Database;
-			sourceTree = "<group>";
-		};
-		D76F10E22DD5288600D87AB7 /* Managers */ = {
-			isa = PBXGroup;
-			children = (
-				D76F10D82DD4E37A00D87AB7 /* NetworkManager.swift */,
-			);
-			path = Managers;
+			path = Services;
 			sourceTree = "<group>";
 		};
 		D76F10E32DD528BB00D87AB7 /* Application */ = {
@@ -308,44 +368,19 @@
 			path = DummyRepositories;
 			sourceTree = "<group>";
 		};
-		D7B548E62DCBDF190094BA51 /* Model */ = {
-			isa = PBXGroup;
-			children = (
-				D7B548E52DCBDF190094BA51 /* CoreDataModels.swift */,
-			);
-			path = Model;
-			sourceTree = "<group>";
-		};
-		D7B548F12DCBDF190094BA51 /* View Model */ = {
-			isa = PBXGroup;
-			children = (
-				D76F10D12DD4D8C800D87AB7 /* AddApointmentViewModel.swift */,
-				D7B548F02DCBDF190094BA51 /* DefaultViewModel.swift */,
-			);
-			path = "View Model";
-			sourceTree = "<group>";
-		};
 		D7B548F72DCBDF190094BA51 /* Final Test Project */ = {
 			isa = PBXGroup;
 			children = (
+				D736F2F82DE875DD003A77C6 /* Domain */,
+				D736F2F72DE875AE003A77C6 /* Core */,
+				D76E1B272DE6310C006265C1 /* Features */,
 				D72531FC2DCCFBBB0048E613 /* Utilities */,
 				D76F10E42DD528D500D87AB7 /* AssetsResource */,
-				D76F10E02DD5284A00D87AB7 /* Backend */,
-				D76F10DC2DD5277A00D87AB7 /* Frontend */,
+				D76F10E02DD5284A00D87AB7 /* Services */,
 				D76F10E32DD528BB00D87AB7 /* Application */,
 				D7B548F52DCBDF190094BA51 /* Info.plist */,
 			);
 			path = "Final Test Project";
-			sourceTree = "<group>";
-		};
-		D7B549062DCBDF1F0094BA51 /* DatabaseRepositories */ = {
-			isa = PBXGroup;
-			children = (
-				D7B5490B2DCBE04A0094BA51 /* AppointmentRepository.swift */,
-				D7B549092DCBDFC60094BA51 /* EmployeeRepository.swift */,
-				D7B549072DCBDF510094BA51 /* ServiceRepository.swift */,
-			);
-			path = DatabaseRepositories;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -556,25 +591,26 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D76F10D92DD4E37A00D87AB7 /* NetworkManager.swift in Sources */,
+				D76F10D92DD4E37A00D87AB7 /* RepositoryManager.swift in Sources */,
 				D76F10D02DD4C0F800D87AB7 /* Validator.swift in Sources */,
-				D72531FB2DCCEC980048E613 /* AddAppointmentViewController.swift in Sources */,
-				D7B548F92DCBDF190094BA51 /* CoreDataModels.swift in Sources */,
-				D7B549082DCBDF510094BA51 /* ServiceRepository.swift in Sources */,
+				D72531FB2DCCEC980048E613 /* AppointmentFormViewController.swift in Sources */,
 				D7B548FA2DCBDF190094BA51 /* AppointmentCardTableViewCell.swift in Sources */,
+				D76E1B312DE639A9006265C1 /* AppointmentRepository.swift in Sources */,
 				D7B548FB2DCBDF190094BA51 /* EmployeeSelectionCollectionViewCell.swift in Sources */,
-				D7B548FC2DCBDF190094BA51 /* ViewController.swift in Sources */,
+				D72F953B2DE6401100475484 /* CoreDataManager.swift in Sources */,
+				D7B548FC2DCBDF190094BA51 /* AppointmentDashboardViewController.swift in Sources */,
+				D72F953E2DE6502000475484 /* CoreDataModels.swift in Sources */,
 				D73E37492DD24EA6003EBA21 /* ServiceSelectionViewController.swift in Sources */,
-				D7B5490A2DCBDFDA0094BA51 /* EmployeeRepository.swift in Sources */,
-				D7B548FD2DCBDF190094BA51 /* DefaultViewModel.swift in Sources */,
-				D76F10D22DD4D8D100D87AB7 /* AddApointmentViewModel.swift in Sources */,
+				D71F2F412DE7409500B1526F /* RepositoryErrors.swift in Sources */,
+				D7B548FD2DCBDF190094BA51 /* AppointmentDashboardViewModel.swift in Sources */,
+				D76F10D22DD4D8D100D87AB7 /* ApointmentFormViewModel.swift in Sources */,
 				D72531FE2DCCFBD40048E613 /* AppEnvironment.swift in Sources */,
+				D72F95372DE63EF100475484 /* ServiceRepository.swift in Sources */,
+				D72F95382DE63EF100475484 /* EmployeeRepository.swift in Sources */,
 				D76F10DB2DD5232500D87AB7 /* Utilities.swift in Sources */,
 				D7B548FE2DCBDF190094BA51 /* AppDelegate.swift in Sources */,
-				D7B5490C2DCBE04C0094BA51 /* AppointmentRepository.swift in Sources */,
 				D7B548FF2DCBDF190094BA51 /* Final_Test_Project.xcdatamodeld in Sources */,
 				D7B549002DCBDF190094BA51 /* SceneDelegate.swift in Sources */,
-				D77B06672DD36786007B558B /* AddEmployeeAndServiceViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

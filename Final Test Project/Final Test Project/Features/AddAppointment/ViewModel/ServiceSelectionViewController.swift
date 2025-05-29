@@ -8,7 +8,7 @@
 import UIKit
 
 protocol ServiceSelectionDelegate: AnyObject {
-    func didSelectServices(_ services: [ServiceModel])
+    func didSelectServices(_ services: [Services])
 }
 
 
@@ -16,8 +16,8 @@ class ServiceSelectionViewController: UIViewController {
     
     @IBOutlet weak var tabelView: UITableView!
     
-    var availableServices: [ServiceModel] = []
-    var selectedServices: [ServiceModel] = []
+    var availableServices: [Services] = []
+    var selectedServices: [Services] = []
     weak var delegate: ServiceSelectionDelegate?
     
     override func viewDidLoad() {

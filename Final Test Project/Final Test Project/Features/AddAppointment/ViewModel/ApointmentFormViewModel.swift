@@ -7,28 +7,28 @@
 
 import Foundation
 
-protocol AddApointmentViewModlDelegate: AnyObject {
+protocol ApointmentFormViewModlDelegate: AnyObject {
     func didFailWithError(_ error: Error)
 }
 // MARK: - AddAppointmentViewModel
 @MainActor
-class AddAppointmentViewModel {
+class AppointmentFormViewModel {
     
     // MARK: - Properties
-    weak var delegate: AddApointmentViewModlDelegate?
-    private var networkManager: NetworkManager?
+    weak var delegate: ApointmentFormViewModlDelegate?
+    private var networkManager: RepositoryManager?
     
-    var selectedEmployee: EmployeeModel?
-    var selectedServices: [ServiceModel] = []
-    var availableServicesForEmployee: [ServiceModel] = []
+    var selectedEmployee: Employees?
+    var selectedServices: [Services] = []
+    var availableServicesForEmployee: [Services] = []
     var startDate: Date?
     var endDate: Date?
     var clientName: String = ""
-    var employees: [EmployeeModel] = []
+    var employees: [Employees] = []
     var selectedEmployeeId: UUID? = nil
     
     // MARK: - Init
-    init(networkManager: NetworkManager) {
+    init(networkManager: RepositoryManager) {
         self.networkManager = networkManager
     }
     
@@ -48,7 +48,7 @@ class AddAppointmentViewModel {
     }
     
     var selectedServicesText: String {
-        return selectedServices.map { $0.title }.joined(separator: ", ")
+        return selectedServices.map { $0.title! }.joined(separator: ", ")
     }
     
     // MARK: - Public Methods
@@ -56,13 +56,15 @@ class AddAppointmentViewModel {
         let result = await networkManager?.getEmployees()
         switch result {
         case .success(let fetchedEmployees):
-            employees = fetchedEmployees
+            // Drop the first employee if needed
+            employees = Array(fetchedEmployees.dropFirst())
         case .failure(let error):
             delegate?.didFailWithError(error)
         case .none:
             break
         }
     }
+
     
     func selectEmployee(at index: Int) {
         selectedEmployee = employees[index]
@@ -90,9 +92,12 @@ class AddAppointmentViewModel {
     }
     
     func validateTimeRange() -> Bool {
-        guard let start = startDate, let end = endDate else { return false }
+        guard let start = startDate, let end = endDate else {
+            return true
+        }
         return validateAppointmentInput(startTime: start, endTime: end)
     }
+
     
     func validateName(_ name: String) -> Bool {
         return isUserNameValid(name)
@@ -102,7 +107,7 @@ class AddAppointmentViewModel {
         return selectedEmployee != nil
     }
     
-    func updateSelectedServices(_ services: [ServiceModel]) {
+    func updateSelectedServices(_ services: [Services]) {
         selectedServices = services
     }
     
@@ -111,22 +116,35 @@ class AddAppointmentViewModel {
         selectedServices = []
     }
     
-    func populateDataForEditing(with appointment: AppointmentModel) {
-        clientName = appointment.clientName
-        startDate = appointment.startTime
-        endDate = appointment.endTime
-        selectedEmployee = appointment.employee
-        selectedServices = appointment.services
-        selectedEmployeeId = appointment.employee.id
-    }
-    
-    func getServicesForSelectedEmployee() async -> [ServiceModel] {
-        guard let selectedId = selectedEmployeeId else { return [] }
+    func populateDataForEditing(with appointment: Appointments){
+        clientName = appointment.clientName!
+        startDate = appointment.startTime!
+        endDate = appointment.endTime!
+        selectedEmployee = appointment.employee!
+        selectedEmployeeId = appointment.employee?.id
         
+        if let serviceSet = selectedEmployee?.services as? Set<Services> {
+                availableServicesForEmployee = Array(serviceSet)
+            } else {
+                availableServicesForEmployee = []
+        }
+        
+        if let serviceSet = appointment.services as? Set<Services> {
+            selectedServices = Array(serviceSet)
+            print("Selected services loaded: \(selectedServices.map { $0.title ?? "" })")
+        } else {
+            print("Failed to cast services to Set<Services>")
+            selectedServices = []
+        }
+    }
+
+    
+    func getServicesForSelectedEmployee() async -> [Services] {
+        guard let selectedId = selectedEmployeeId else { return [] }
         let result = await networkManager?.getEmployeeServices(for: selectedId)
         switch result {
-        case .success(let serviceModels):
-            return serviceModels
+        case .success(let services):
+            return services
         case .failure(let error):
             delegate?.didFailWithError(error)
             return []
@@ -145,7 +163,7 @@ class AddAppointmentViewModel {
         return validateTimeRange()
     }
     
-    func createAppointment(clientName: String) async -> Bool {
+    func createAppointment() async -> Bool {
         guard validateAllFields(clientName: clientName),
               let employee = selectedEmployee,
               let startTime = startDate,
@@ -153,26 +171,18 @@ class AddAppointmentViewModel {
             return false
         }
         
-        let employeeResult = await networkManager?.getEmployee(by: employee.id)
-        guard case .success(let employeeEntity) = employeeResult else {
-            delegate?.didFailWithError(NSError(domain: "AppointmentError", code: 400, userInfo: [NSLocalizedDescriptionKey: "Employee not found"]))
-            return false
-        }
-
-        let serviceResult = await networkManager?.getServices(by: selectedServices.map { $0.id })
-        guard case .success(let serviceEntities) = serviceResult else {
-            delegate?.didFailWithError(NSError(domain: "AppointmentError", code: 401, userInfo: [NSLocalizedDescriptionKey: "Service loading failed"]))
-            return false
-        }
-
-        let result = await networkManager?.addAppointment(
-            clientName: clientName,
-            startTime: startTime,
-            endTime: endTime,
-            employee: employeeEntity,
-            services: serviceEntities
-        )
+        let mainContext = CoreDataManager.shared.mainContext
         
+        guard let employeeInMainContext = mainContext.object(with: employee.objectID) as? Employees else {
+            delegate?.didFailWithError(NSError(domain: "AppointmentError", code: 402, userInfo: [NSLocalizedDescriptionKey: "Failed to get employee in main context"]))
+            return false
+        }
+        
+        let servicesInMainContext = selectedServices.compactMap { service in
+            return mainContext.object(with: service.objectID) as? Services
+        }
+        
+        let result = await networkManager?.createAppointment(clientName: clientName, startTime: startTime, endTime: endTime, employee: employeeInMainContext, services: servicesInMainContext)
         switch result {
         case .success(let created):
             print(created)
@@ -184,34 +194,23 @@ class AddAppointmentViewModel {
             return false
         }
     }
+
     
-    func updateAppointment(existingAppointment: AppointmentModel, clientName: String) async -> Bool {
+    func updateAppointment(existingAppointment: Appointments) async -> Bool {
         guard validateAllFields(clientName: clientName),
-              let employee = selectedEmployee,
+              let _ = selectedEmployee,
               let startTime = startDate,
               let endTime = endDate else {
             return false
         }
         
-        let employeeResult = await networkManager?.getEmployee(by: employee.id)
-        guard case .success(let employeeEntity) = employeeResult else {
-            delegate?.didFailWithError(NSError(domain: "AppointmentError", code: 400, userInfo: [NSLocalizedDescriptionKey: "Employee not found"]))
-            return false
-        }
-
-        let serviceResult = await networkManager?.getServices(by: selectedServices.map { $0.id })
-        guard case .success(let serviceEntities) = serviceResult else {
-            delegate?.didFailWithError(NSError(domain: "AppointmentError", code: 401, userInfo: [NSLocalizedDescriptionKey: "Service loading failed"]))
-            return false
-        }
-
         let result = await networkManager?.updateAppointment(
-            appointment: existingAppointment,
-            clientName: clientName,
-            startTime: startTime,
-            endTime: endTime,
-            employee: employeeEntity,
-            services: serviceEntities
+            with: existingAppointment,
+            newClientName: clientName,
+            newStartTime: startTime,
+            newEndTime: endTime,
+            selectedEmployee: selectedEmployee!,
+            selectedServices: selectedServices
         )
 
         switch result {
@@ -224,6 +223,7 @@ class AddAppointmentViewModel {
             return false
         }
     }
+
     
     // MARK: - Private Methods
     private func formatDate(_ date: Date) -> String {
@@ -245,6 +245,5 @@ class AddAppointmentViewModel {
             delegate?.didFailWithError(error)
             return false
         }
-    }
-    
+    }    
 }

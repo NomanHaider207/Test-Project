@@ -9,11 +9,11 @@ protocol AddAppointmentDelegate: AnyObject {
 // MARK: - Enums
 enum ScreenMode {
     case addAppointment
-    case editAppointment(existingAppointment: AppointmentModel)
+    case editAppointment(existingAppointment: Appointments)
 }
 
 // MARK: - ViewController
-class AddAppointmentViewController: UIViewController {
+class AppointmentFormViewController: UIViewController {
 
     // MARK: - IBOutlets
     @IBOutlet weak var screenTitleLabel: UILabel!
@@ -27,9 +27,12 @@ class AddAppointmentViewController: UIViewController {
     @IBOutlet weak var startDateTimePicker: UIDatePicker!
     @IBOutlet weak var endDateTimePicker: UIDatePicker!
     @IBOutlet weak var buttonLabel: UIButton!
+    @IBOutlet weak var startDateTimeContainer: UIStackView!
+    @IBOutlet weak var endDateTimeContainer: UIStackView!
+    
     
     // MARK: - Properties
-    private var viewModel: AddAppointmentViewModel!
+    private var viewModel: AppointmentFormViewModel!
     var selectionType: ScreenMode = .addAppointment
     weak var delegate: AddAppointmentDelegate?
 
@@ -56,6 +59,7 @@ class AddAppointmentViewController: UIViewController {
 
         switch selectionType {
         case .addAppointment:
+            print("[Add Appointment View Controller] - Create Appointment Button Pressed")
             createAppointment()
         case .editAppointment(let existingAppointment):
             updateAppointment(existingAppointment: existingAppointment)
@@ -67,9 +71,20 @@ class AddAppointmentViewController: UIViewController {
         dismiss(animated: true)
     }
 
+    @IBAction func startDateTimeDoneButtonPressed(_ sender: UIButton) {
+        startTimeTextView.text = viewModel.formattedStartTime
+        startDateTimeContainer.isHidden = true
+    }
+    
+    @IBAction func endDateTimeDoneButtonPressed(_ sender: UIButton) {
+        endTimeTextView.text = viewModel.formattedEndTime
+        endDateTimeContainer.isHidden = true
+    }
+    
+    
     // MARK: - Setup
     private func setupViewModel() {
-        viewModel = AddAppointmentViewModel(networkManager: AppEnvironment.shared.networkManger)
+        viewModel = AppointmentFormViewModel(networkManager: AppEnvironment.shared.networkManger)
         viewModel.delegate = self
     }
     
@@ -84,8 +99,8 @@ class AddAppointmentViewController: UIViewController {
     
     private func setupInitialVisibility() {
         employeePickerView.isHidden = true
-        startDateTimePicker.isHidden = true
-        endDateTimePicker.isHidden = true
+        startDateTimeContainer.isHidden = true
+        endDateTimeContainer.isHidden = true
         clientNameErrorLabel.isHidden = true
     }
 
@@ -115,7 +130,7 @@ class AddAppointmentViewController: UIViewController {
     }
 
     private func setupDatePickers() {
-        let now = Date()
+        let now = Date().roundedUpToNext5Minutes()
 
         startDateTimePicker.minuteInterval = 5
         startDateTimePicker.date = now
@@ -123,9 +138,11 @@ class AddAppointmentViewController: UIViewController {
         startDateTimePicker.addTarget(self, action: #selector(startDateChanged), for: .valueChanged)
         startDateTimePicker.translatesAutoresizingMaskIntoConstraints = false
         startDateTimePicker.heightAnchor.constraint(equalToConstant: 135).isActive = true
+        viewModel.updateStartTime(now)
         
+        let endDateTime = viewModel.startDate?.addingTimeInterval(5 * 60).roundedUpToNext5Minutes()
         endDateTimePicker.minuteInterval = 5
-        endDateTimePicker.minimumDate = now
+        endDateTimePicker.minimumDate = endDateTime ?? Date().roundedUpToNext5Minutes()
         endDateTimePicker.addTarget(self, action: #selector(endDateChanged), for: .valueChanged)
         endDateTimePicker.translatesAutoresizingMaskIntoConstraints = false
         endDateTimePicker.heightAnchor.constraint(equalToConstant: 135).isActive = true
@@ -149,7 +166,6 @@ class AddAppointmentViewController: UIViewController {
         endTimeTextView.text = viewModel.formattedEndTime
         selectEmployeeTextView.text = viewModel.selectedEmployeeName
         selectServicesTextView.text = viewModel.selectedServicesText
-        
         startDateTimePicker.date = viewModel.startDate ?? Date()
         endDateTimePicker.date = viewModel.endDate ?? Date()
     }
@@ -171,18 +187,20 @@ class AddAppointmentViewController: UIViewController {
 
     // MARK: - DatePicker Events
     @objc private func startDateChanged() {
-        let start = startDateTimePicker.date
+        let start = startDateTimePicker.date.roundedUpToNext5Minutes()
         viewModel.updateStartTime(start)
         startTimeTextView.text = viewModel.formattedStartTime
         
         startTimeTextView.resignFirstResponder()
-        startDateTimePicker.isHidden = true
-        
+
+        let endDateTime = viewModel.startDate?.addingTimeInterval(5 * 60).roundedUpToNext5Minutes()
+        endDateTimePicker.date = endDateTime ?? Date().roundedUpToNext5Minutes()
+        viewModel.updateEndTime(endDateTime ?? Date().roundedUpToNext5Minutes())
         endTimeTextView.text = ""
     }
 
     @objc private func endDateChanged() {
-        let end = endDateTimePicker.date
+        let end = endDateTimePicker.date.roundedUpToNext5Minutes()
         
         if !viewModel.canSetEndTime(end) {
             Utilities.shared.showAlert(title: "Notice", message: "End time cannot be earlier than start time.")
@@ -192,10 +210,7 @@ class AddAppointmentViewController: UIViewController {
 
         viewModel.updateEndTime(end)
         endTimeTextView.text = viewModel.formattedEndTime
-        
         endTimeTextView.resignFirstResponder()
-        endDateTimePicker.isHidden = true
-        
         validateTimeRange()
     }
 
@@ -207,17 +222,17 @@ class AddAppointmentViewController: UIViewController {
     private func validateTimeRange() {
         if !viewModel.validateTimeRange() {
             endTimeTextView.text = ""
-            Utilities.shared.showAlert(title: "Notice",message: "Invalid time range. Appointment can't be longer than 5 hours.")
         }
     }
 
     // MARK: - Appointment Logic
     private func createAppointment() {
         Task {
-                let success = await viewModel.createAppointment(clientName: clientNameTextView.text ?? "")
+                print("[Add Appointment View Controller] - Create Appointment Function Called.")
+                let success = await viewModel.createAppointment()
                 if success {
                     await MainActor.run {
-                        Utilities.shared.showAlert(title: "Success", message: "Appointment updated successfully.") {
+                        Utilities.shared.showAlert(title: "Success", message: "Appointment added successfully.") {
                             self.delegate?.didAddAppointment()
                             self.dismiss(animated: true)
                         }
@@ -226,22 +241,18 @@ class AddAppointmentViewController: UIViewController {
         }
     }
     
-    private func updateAppointment(existingAppointment: AppointmentModel) {
+    private func updateAppointment(existingAppointment: Appointments) {
         Task {
-            do {
-                let success = await viewModel.updateAppointment(existingAppointment: existingAppointment, clientName: clientNameTextView.text ?? "")
-                if success {
-                    await MainActor.run {
-                        Utilities.shared.showAlert(title: "Success", message: "Appointment updated successfully.") {
-                            self.delegate?.didAddAppointment()
-                            self.dismiss(animated: true)
-                        }
+            let success = await viewModel.updateAppointment(existingAppointment: existingAppointment)
+            if success {
+                await MainActor.run {
+                    Utilities.shared.showAlert(title: "Success", message: "Appointment updated successfully.") {
+                        self.delegate?.didAddAppointment()
+                        self.dismiss(animated: true)
                     }
                 }
-            } catch {
-                await MainActor.run {
-                    Utilities.shared.showAlert(title: "Error", message: "Failed to update appointment: \(error.localizedDescription)")
-                }
+            } else {
+                Utilities.shared.showAlert(title: "Error", message: "Error while updating appointment")
             }
         }
     }
@@ -258,12 +269,12 @@ class AddAppointmentViewController: UIViewController {
 }
 
 // MARK: - UITextFieldDelegate
-extension AddAppointmentViewController: UITextFieldDelegate {
+extension AppointmentFormViewController: UITextFieldDelegate {
     func textFieldDidBeginEditing(_ textField: UITextField) {
         // Hide all
         employeePickerView.isHidden = true
-        startDateTimePicker.isHidden = true
-        endDateTimePicker.isHidden = true
+        startDateTimeContainer.isHidden = true
+        endDateTimeContainer.isHidden = true
         selectEmployeeTextView.isHidden = false
 
         switch textField {
@@ -271,30 +282,68 @@ extension AddAppointmentViewController: UITextFieldDelegate {
             selectEmployeeTextView.isHidden = true
             employeePickerView.isHidden = false
         case startTimeTextView:
-            startDateTimePicker.isHidden = false
+            startDateTimeContainer.isHidden = false
         case endTimeTextView:
-            endDateTimePicker.isHidden = false
+            endDateTimeContainer.isHidden = false
         default:
             break
         }
     }
     
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        if textField == clientNameTextView {
+        switch textField {
+        case clientNameTextView:
             let currentText = (textField.text ?? "") as NSString
             let updatedText = currentText.replacingCharacters(in: range, with: string)
             
-            clientNameErrorLabel.isHidden = viewModel   .validateName(updatedText)
-            if !clientNameErrorLabel.isHidden {
+            viewModel.clientName = updatedText  // ✅ live update to ViewModel
+
+            if updatedText.isEmpty {
+                clientNameErrorLabel.isHidden = true
+            } else if viewModel.validateName(updatedText) {
+                clientNameErrorLabel.isHidden = true
+            } else {
+                clientNameErrorLabel.isHidden = false
                 clientNameErrorLabel.text = "Name must contain alphabets only"
             }
+            return true
+            
+        case startTimeTextView, endTimeTextView:
+            return false
+            
+        default:
+            return true
         }
-        return true
     }
+
+    
+    private func handleClientNameValidation(_ textField: UITextField, range: NSRange, replacementString string: String) {
+        let currentText = (textField.text ?? "") as NSString
+        let updatedText = currentText.replacingCharacters(in: range, with: string)
+
+        if updatedText.isEmpty {
+            clientNameErrorLabel.isHidden = true
+            return
+        }
+
+        if viewModel.validateName(updatedText) {
+            clientNameErrorLabel.isHidden = true
+        } else {
+            clientNameErrorLabel.isHidden = false
+            clientNameErrorLabel.text = "Name must contain alphabets only"
+        }
+    }
+    
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        if textField == clientNameTextView {
+            viewModel.clientName = textField.text ?? ""
+        }
+    }
+
 }
 
 // MARK: - UIPickerViewDelegate/DataSource
-extension AddAppointmentViewController: UIPickerViewDelegate, UIPickerViewDataSource {
+extension AppointmentFormViewController: UIPickerViewDelegate, UIPickerViewDataSource {
     func numberOfComponents(in pickerView: UIPickerView) -> Int { 1 }
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
@@ -322,18 +371,29 @@ extension AddAppointmentViewController: UIPickerViewDelegate, UIPickerViewDataSo
     }
 }
 
-extension AddAppointmentViewController: AddApointmentViewModlDelegate {
+extension AppointmentFormViewController: ApointmentFormViewModlDelegate {
     
     func didFailWithError(_ error: any Error) {
         DispatchQueue.main.async {
-            Utilities.shared.showAlert(title:"Error",message: "Failed to update appointment: \(error.localizedDescription)")
+            Utilities.shared.showAlert(title:"Error",message: "\(error.localizedDescription)")
         }
     }
 }
 // MARK: - ServiceSelectionDelegate
-extension AddAppointmentViewController: ServiceSelectionDelegate {
-    func didSelectServices(_ services: [ServiceModel]) {
+extension AppointmentFormViewController: ServiceSelectionDelegate {
+    func didSelectServices(_ services: [Services]) {
         viewModel.updateSelectedServices(services)
         selectServicesTextView.text = viewModel.selectedServicesText
+    }
+}
+
+
+extension Date {
+    func roundedUpToNext5Minutes() -> Date {
+        let calendar = Calendar.current
+        let minute = calendar.component(.minute, from: self)
+        let remainder = minute % 5
+        let minutesToAdd = remainder == 0 ? 0 : (5 - remainder)
+        return calendar.date(byAdding: .minute, value: minutesToAdd, to: self)!
     }
 }

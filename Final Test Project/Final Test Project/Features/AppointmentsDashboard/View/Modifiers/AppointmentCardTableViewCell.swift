@@ -23,6 +23,7 @@ class AppointmentCardTableViewCell: UITableViewCell {
     @IBOutlet weak var optionsButton: UIButton!
     
     static let identifier = "appointmentCard"
+    static let appointmentTableViewCellIdentifier = "AppointmentCardTableViewCell"
     
     weak var delegate: AppointmentCardCellDelegate?
     
@@ -35,7 +36,6 @@ class AppointmentCardTableViewCell: UITableViewCell {
         containerView.layer.shadowOpacity = 0.1
         containerView.layer.shadowOffset = CGSize(width: 0, height: 2)
         containerView.layer.shadowRadius = 4
-
         setupMenu()
     }
 
@@ -63,12 +63,23 @@ class AppointmentCardTableViewCell: UITableViewCell {
     @IBAction func onOptionsButtonPressed(_ sender: UIButton) {
     }
     
-    func configure(_ cell: AppointmentCardTableViewCell, at section: Int, appointment: AppointmentModel, viewModel: DefaultViewModel) {
+    func configure(_ cell: AppointmentCardTableViewCell, at section: Int, appointment: Appointments, viewModel: AppointmentDashboardViewModel) {
         
-        cell.employeeNameLabelTableViewCell.text = appointment.employee.name
-        cell.clientNameTableViewCell.text = appointment.clientName
-        cell.serviceLabelTableViewCell.text = viewModel.formatServicesList(appointment.services)
+        if let employeeName = appointment.employee?.name {
+            cell.employeeNameLabelTableViewCell.text = employeeName
+        } else {
+            cell.employeeNameLabelTableViewCell.text = "Unknown Employee"
+        }
+
+        cell.clientNameTableViewCell.text = appointment.clientName ?? "Unknown Client"
+        
         cell.timeLabelTableViewCell.text = viewModel.formattedTime(for: appointment)
+
+        if let servicesSet = appointment.services, let serviceArray = servicesSet.allObjects as? [Services], !serviceArray.isEmpty {
+            cell.serviceLabelTableViewCell.text = viewModel.formatServicesList(serviceArray)
+        } else {
+            cell.serviceLabelTableViewCell.text = "No Services"
+        }
     }
-    
+
 }

@@ -10,10 +10,10 @@ import XCTest
 
 @MainActor
 final class DefaultViewModelTest: XCTestCase {
-    private var sut: DefaultViewModel!
+    private var sut: AppointmentDashboardViewModel!
     override func setUpWithError() throws {
         try super.setUpWithError()
-        sut = DefaultViewModel(networkManager: MockNetworkManager())
+        sut = AppointmentDashboardViewModel(networkManager: MockNetworkManager())
     }
 
     override func tearDownWithError() throws {
@@ -200,7 +200,7 @@ final class DefaultViewModelTest: XCTestCase {
     func testLoadEmployeesSuccess() async {
         let mockEmployees = [EmployeeModel(id: UUID(), name: "Noman", services: [])]
         let mockManager = MockNetworkManager(mockEmployeeModels: mockEmployees)
-        let viewModel = DefaultViewModel(networkManager: mockManager)
+        let viewModel = AppointmentDashboardViewModel(networkManager: mockManager)
         
         let delegate = MockAppointmentViewModelDelegate()
         viewModel.delegate = delegate
@@ -214,7 +214,7 @@ final class DefaultViewModelTest: XCTestCase {
     
     func testLoadEmployeeFailure() async {
         let mockManager = MockNetworkManager(shouldFail: true)
-        let viewModel = DefaultViewModel(networkManager: mockManager)
+        let viewModel = AppointmentDashboardViewModel(networkManager: mockManager)
         
         let delegate = MockAppointmentViewModelDelegate()
         viewModel.delegate = delegate

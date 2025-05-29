@@ -5,7 +5,7 @@ import CoreData
 
 // MARK: - ViewController
 
-class ViewController: UIViewController {
+class AppoinmentDashboardViewController: UIViewController {
     
     // MARK: - Outlets
     @IBOutlet weak var tableView: UITableView!
@@ -13,8 +13,8 @@ class ViewController: UIViewController {
     @IBOutlet weak var collectionView: UICollectionView!
     
     // MARK: - Properties
-    private var viewModel: DefaultViewModel!
-    private var screenMode: ScreenMode = .addAppointment
+    private var viewModel: AppointmentDashboardViewModel!
+    
     
     // MARK: - Lifecycle Methods
     override func viewDidLoad() {
@@ -31,19 +31,20 @@ class ViewController: UIViewController {
     }
     
     @IBAction func addAppointmentPressed(_ sender: UIButton) {
-        screenMode = .addAppointment
+        viewModel.screenMode = .addAppointment
         performSegue(withIdentifier: "addAppointmentSegue", sender: self)
     }
     
     // MARK: - Setup
     private func setupUI() {
-        tableView.register(UINib(nibName: "AppointmentCardTableViewCell", bundle: nil), forCellReuseIdentifier: "appointmentCard")
-        viewModel = DefaultViewModel(networkManager: AppEnvironment.shared.networkManger)
+        tableView.register(UINib(nibName: AppointmentCardTableViewCell.appointmentTableViewCellIdentifier, bundle: nil), forCellReuseIdentifier: AppointmentCardTableViewCell.identifier)
+        viewModel = AppointmentDashboardViewModel(networkManager: AppEnvironment.shared.networkManger)
         viewModel.delegate = self
     }
     
     private func loadData() {
         Task {
+            //await viewModel.creatDummyData()
             await viewModel.loadEmployees()
             await viewModel.loadAppointments()
             
@@ -54,21 +55,15 @@ class ViewController: UIViewController {
     
     // MARK: - Navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if let addVC = segue.destination as? AddAppointmentViewController {
+        if let addVC = segue.destination as? AppointmentFormViewController {
             addVC.delegate = self
-            
-            switch screenMode {
-            case .addAppointment:
-                addVC.selectionType = .addAppointment
-            case .editAppointment(let appointment):
-                addVC.selectionType = .editAppointment(existingAppointment: appointment)
-            }
+            addVC.selectionType = viewModel.screenMode
         }
     }
 }
 
 // MARK: - UICollectionViewDataSource & Delegate
-extension ViewController: UICollectionViewDataSource, UICollectionViewDelegate {
+extension AppoinmentDashboardViewController: UICollectionViewDataSource, UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
             return viewModel.employees.count
@@ -82,13 +77,11 @@ extension ViewController: UICollectionViewDataSource, UICollectionViewDelegate {
         }
 
         // MARK: - UICollectionViewDelegate
-
         func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
             viewModel.selectEmployee(at: indexPath.row)
             collectionView.reloadData()
         }
 
-        // Optional: you may remove this since reloadData will handle deselection UI
         func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
             if let deselectedCell = collectionView.cellForItem(at: indexPath) as? EmployeeSelectionCollectionViewCell {
                 deselectedCell.contentView.backgroundColor = .clear
@@ -96,22 +89,24 @@ extension ViewController: UICollectionViewDataSource, UICollectionViewDelegate {
         }
 
         // MARK: - Cell Configuration
-
-        private func configureCell(_ cell: EmployeeSelectionCollectionViewCell, with employee: EmployeeModel) {
+        private func configureCell(_ cell: EmployeeSelectionCollectionViewCell, with employee: Employees) {
             cell.employeeNameLabel.text = employee.name
 
             if let selectedId = viewModel.selectedEmployeeId, employee.id == selectedId {
                 cell.contentView.backgroundColor = UIColor(named: "appColor")
+                cell.employeeNameLabel.textColor = .white
             } else if employee.name == "All" && viewModel.selectedEmployeeId == nil {
                 cell.contentView.backgroundColor = UIColor(named: "appColor")
+                cell.employeeNameLabel.textColor = .white
             } else {
                 cell.contentView.backgroundColor = .clear
+                cell.employeeNameLabel.textColor = .black
             }
         }
 }
 
 // MARK: - UITableViewDataSource & Delegate
-extension ViewController: UITableViewDataSource, UITableViewDelegate {
+extension AppoinmentDashboardViewController: UITableViewDataSource, UITableViewDelegate {
     
     func numberOfSections(in tableView: UITableView) -> Int {
         return viewModel.appointments.count
@@ -156,12 +151,12 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
 }
 
 // MARK: - AppointmentCardCellDelegate
-extension ViewController: AppointmentCardCellDelegate {
+extension AppoinmentDashboardViewController: AppointmentCardCellDelegate {
     
     func didTapEdit(on cell: AppointmentCardTableViewCell) {
         guard let indexPath = tableView.indexPath(for: cell) else { return }
         let appointment = viewModel.appointments[indexPath.section]
-        screenMode = .editAppointment(existingAppointment: appointment)
+        viewModel.screenMode = .editAppointment(existingAppointment: appointment)
         performSegue(withIdentifier: "addAppointmentSegue", sender: self)
     }
 
@@ -183,7 +178,7 @@ extension ViewController: AppointmentCardCellDelegate {
                 handler: { _ in
     
                     Task {
-                        await self.viewModel.deleteAppointment(appointment.id)
+                        await self.viewModel.deleteAppointment(appointment.id!)
                     }
                 }
             ))
@@ -192,7 +187,7 @@ extension ViewController: AppointmentCardCellDelegate {
 }
 
 // MARK: - AddAppointmentDelegate
-extension ViewController: AddAppointmentDelegate {
+extension AppoinmentDashboardViewController: AddAppointmentDelegate {
     func didAddAppointment() {
         Task {
             await viewModel.loadAppointments()
@@ -202,7 +197,7 @@ extension ViewController: AddAppointmentDelegate {
 }
 
 // MARK: - ViewModelDelegate
-extension ViewController: ViewModelDelegate {
+extension AppoinmentDashboardViewController: ViewModelDelegate {
     
     func didFailWithError(_ error: Error) {
         DispatchQueue.main.async {
@@ -211,9 +206,6 @@ extension ViewController: ViewModelDelegate {
     }
     
     func didUpdateData() {
-        DispatchQueue.main.async {
             self.tableView.reloadData()
-            self.collectionView.reloadData()
-        }
     }
 }
