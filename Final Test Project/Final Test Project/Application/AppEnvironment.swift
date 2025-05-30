@@ -8,6 +8,7 @@
 import Foundation
 import UIKit
 
+// if I make the RepoManager Singleton I am unable to pass those repos to the Network Manager I have to declared them in the class and for the 
 @MainActor
 final class AppEnvironment {
     static let shared: AppEnvironment = {

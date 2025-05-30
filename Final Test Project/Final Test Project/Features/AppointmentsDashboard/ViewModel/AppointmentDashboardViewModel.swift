@@ -14,7 +14,7 @@ final class AppointmentDashboardViewModel: ObservableObject {
     // MARK: - Dependencies
     private let networkManager: RepositoryManager
     weak var delegate: ViewModelDelegate?
-    var screenMode: ScreenMode = .addAppointment
+    var screenMode: AppointmentFormMode = .add
 
     // MARK: - Published Properties
     @Published var appointments: [Appointments] = []
@@ -144,6 +144,25 @@ final class AppointmentDashboardViewModel: ObservableObject {
         let formatter = DateFormatter()
         formatter.dateFormat = "MMM d, h:mm a"
         return "\(formatter.string(from: start)) - \(formatter.string(from: end))"
+    }
+    
+    
+    func getEmployeeListLength() -> Int {
+        return employees.count
+    }
+    func getAppointmentListLength() -> Int{
+        return appointments.count
+    }
+    
+    func isEmployeeSelected(_ employee: Employees) -> Bool {
+        if let selectedId = selectedEmployeeId {
+            return employee.id == selectedId
+        }
+        return employee.name == "All"
+    }
+    
+    func appointment(at section: Int) -> Appointments {
+        return appointments[section]
     }
 
 }

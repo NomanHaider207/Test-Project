@@ -19,7 +19,8 @@ class AppoinmentDashboardViewController: UIViewController {
     // MARK: - Lifecycle Methods
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupUI()
+        setupViewModel()
+        self.setupTableViewCell()
         loadData()
     }
     
@@ -29,13 +30,16 @@ class AppoinmentDashboardViewController: UIViewController {
     }
     
     @IBAction func addAppointmentPressed(_ sender: UIButton) {
-        viewModel.screenMode = .addAppointment
+        viewModel.screenMode = .add
         performSegue(withIdentifier: "addAppointmentSegue", sender: self)
     }
     
     // MARK: - Setup
-    private func setupUI() {
+    private func setupTableViewCell() {
         tableView.register(UINib(nibName: AppointmentCardTableViewCell.appointmentTableViewCellIdentifier, bundle: nil), forCellReuseIdentifier: AppointmentCardTableViewCell.identifier)
+    }
+    
+    private func setupViewModel() {
         viewModel = AppointmentDashboardViewModel(networkManager: AppEnvironment.shared.networkManger)
         viewModel.delegate = self
     }
@@ -54,12 +58,11 @@ class AppoinmentDashboardViewController: UIViewController {
         }
     }
 
-    
     // MARK: - Navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if let addVC = segue.destination as? AppointmentFormViewController {
             addVC.delegate = self
-            addVC.selectionType = viewModel.screenMode
+            addVC.formMode = viewModel.screenMode
         }
     }
 }
@@ -68,50 +71,41 @@ class AppoinmentDashboardViewController: UIViewController {
 extension AppoinmentDashboardViewController: UICollectionViewDataSource, UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-            return viewModel.employees.count
-        }
+        return viewModel.getEmployeeListLength()
+    }
 
-        func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: EmployeeSelectionCollectionViewCell.identifier, for: indexPath) as! EmployeeSelectionCollectionViewCell
-            let employee = viewModel.employees[indexPath.row]
-            configureCell(cell, with: employee)
-            return cell
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: EmployeeSelectionCollectionViewCell.identifier,
+            for: indexPath
+        ) as? EmployeeSelectionCollectionViewCell else {
+            return UICollectionViewCell()
         }
+        
+        let employee = viewModel.employees[indexPath.row]
+        let isSelected = viewModel.isEmployeeSelected(employee)
+        cell.configure(with: employee, isSelected: isSelected)
+        return cell
+    }
 
-        // MARK: - UICollectionViewDelegate
-        func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-            viewModel.selectEmployee(at: indexPath.row)
-            collectionView.reloadData()
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        viewModel.selectEmployee(at: indexPath.row)
+        collectionView.reloadData()
+    }
+
+    func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
+        if let deselectedCell = collectionView.cellForItem(at: indexPath) as? EmployeeSelectionCollectionViewCell {
+            deselectedCell.contentView.backgroundColor = .clear
         }
-
-        func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
-            if let deselectedCell = collectionView.cellForItem(at: indexPath) as? EmployeeSelectionCollectionViewCell {
-                deselectedCell.contentView.backgroundColor = .clear
-            }
-        }
-
-        // MARK: - Cell Configuration
-        private func configureCell(_ cell: EmployeeSelectionCollectionViewCell, with employee: Employees) {
-            cell.employeeNameLabel.text = employee.name
-
-            if let selectedId = viewModel.selectedEmployeeId, employee.id == selectedId {
-                cell.contentView.backgroundColor = UIColor(named: "appColor")
-                cell.employeeNameLabel.textColor = .white
-            } else if employee.name == "All" && viewModel.selectedEmployeeId == nil {
-                cell.contentView.backgroundColor = UIColor(named: "appColor")
-                cell.employeeNameLabel.textColor = .white
-            } else {
-                cell.contentView.backgroundColor = .clear
-                cell.employeeNameLabel.textColor = .black
-            }
-        }
+    }
 }
+
 
 // MARK: - UITableViewDataSource & Delegate
 extension AppoinmentDashboardViewController: UITableViewDataSource, UITableViewDelegate {
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return viewModel.appointments.count
+        return viewModel.getAppointmentListLength()
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -133,8 +127,7 @@ extension AppoinmentDashboardViewController: UITableViewDataSource, UITableViewD
             return UITableViewCell()
         }
         
-        let appointment = viewModel.appointments[indexPath.section]
-        
+        let appointment = viewModel.appointment(at: indexPath.section)
         cell.configure(cell, at: indexPath.section, appointment: appointment, viewModel: viewModel)
         cell.delegate = self
         
@@ -158,7 +151,7 @@ extension AppoinmentDashboardViewController: AppointmentCardCellDelegate {
     func didTapEdit(on cell: AppointmentCardTableViewCell) {
         guard let indexPath = tableView.indexPath(for: cell) else { return }
         let appointment = viewModel.appointments[indexPath.section]
-        viewModel.screenMode = .editAppointment(existingAppointment: appointment)
+        viewModel.screenMode = .edit(existingAppointment: appointment)
         performSegue(withIdentifier: "addAppointmentSegue", sender: self)
     }
 
@@ -203,7 +196,7 @@ extension AppoinmentDashboardViewController: ViewModelDelegate {
     
     func didFailWithError(_ error: Error) {
         DispatchQueue.main.async {
-            Utilities.shared.showAlert(title: "Error", message: error.localizedDescription)
+            AlertManager.shared.showAlert(title: "Error", message: error.localizedDescription)
         }
     }
     

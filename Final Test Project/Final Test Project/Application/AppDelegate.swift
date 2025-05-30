@@ -18,6 +18,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if let storeURL = CoreDataManager.shared.persistentContainer.persistentStoreCoordinator.persistentStores.first?.url {
             print("📂 Core Data SQLite file path: \(storeURL.path)")
         }
+        
         return true
     }
 

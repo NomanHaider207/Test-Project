@@ -16,5 +16,17 @@ class EmployeeSelectionCollectionViewCell: UICollectionViewCell {
         self.layer.cornerRadius = 15
         self.layer.masksToBounds = true
     }
-    
+
+    func configure(with employee: Employees, isSelected: Bool) {
+        employeeNameLabel.text = employee.name
+        
+        if isSelected {
+            contentView.backgroundColor = UIColor(named: "appColor")
+            employeeNameLabel.textColor = .white
+        } else {
+            contentView.backgroundColor = .clear
+            employeeNameLabel.textColor = .black
+        }
+    }
 }
+

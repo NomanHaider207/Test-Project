@@ -6,11 +6,6 @@ protocol AddAppointmentDelegate: AnyObject {
 }
 
 
-// MARK: - Enums
-enum ScreenMode {
-    case addAppointment
-    case editAppointment(existingAppointment: Appointments)
-}
 
 // MARK: - ViewController
 class AppointmentFormViewController: UIViewController {
@@ -33,7 +28,7 @@ class AppointmentFormViewController: UIViewController {
     
     // MARK: - Properties
     private var viewModel: AppointmentFormViewModel!
-    var selectionType: ScreenMode = .addAppointment
+    var formMode: AppointmentFormMode = .add
     weak var delegate: AddAppointmentDelegate?
 
     // MARK: - Lifecycle
@@ -53,15 +48,14 @@ class AppointmentFormViewController: UIViewController {
     // MARK: - Actions
     @IBAction func onCreateAppointmentButtonPressed(_ sender: UIButton) {
         guard viewModel.validateAllFields(clientName: clientNameTextView.text) else {
-            Utilities.shared.showAlert(title: "Notice",message: "Please fill all fields and select at least one service.")
+            AlertManager.shared.showAlert(title: "Notice",message: "Please fill all fields and select at least one service.")
             return
         }
 
-        switch selectionType {
-        case .addAppointment:
-            print("[Add Appointment View Controller] - Create Appointment Button Pressed")
+    switch formMode {
+        case .add:
             createAppointment()
-        case .editAppointment(let existingAppointment):
+        case .edit(let existingAppointment):
             updateAppointment(existingAppointment: existingAppointment)
         }
     }
@@ -84,7 +78,7 @@ class AppointmentFormViewController: UIViewController {
     
     // MARK: - Setup
     private func setupViewModel() {
-        viewModel = AppointmentFormViewModel(networkManager: AppEnvironment.shared.networkManger)
+        viewModel = AppointmentFormViewModel(networkManager: AppEnvironment.shared.networkManger, mode: formMode)
         viewModel.delegate = self
     }
     
@@ -149,15 +143,8 @@ class AppointmentFormViewController: UIViewController {
     }
     
     private func configureBasedOnSelectionType() {
-        switch selectionType {
-        case .addAppointment:
-            break
-        case .editAppointment(let appointment):
-            screenTitleLabel.text = "Update Appoinment"
-            buttonLabel.setTitle("Save", for: .normal)
-            viewModel.populateDataForEditing(with: appointment)
-            updateUIForEditing()
-        }
+        screenTitleLabel.text = viewModel.screenTitle
+        buttonLabel.setTitle(viewModel.buttonTitle, for: .normal)
     }
     
     private func updateUIForEditing() {
@@ -179,7 +166,7 @@ class AppointmentFormViewController: UIViewController {
     
     @objc private func serviceFieldTapped() {
         if !viewModel.canSelectServices() {
-            Utilities.shared.showAlert(title: "Notice", message: "Please select an employee first.")
+            AlertManager.shared.showAlert(title: "Notice", message: "Please select an employee first.")
             return
         }
         performSegue(withIdentifier: "showServiceSelection", sender: self)
@@ -203,7 +190,7 @@ class AppointmentFormViewController: UIViewController {
         let end = endDateTimePicker.date.roundedUpToNext5Minutes()
         
         if !viewModel.canSetEndTime(end) {
-            Utilities.shared.showAlert(title: "Notice", message: "End time cannot be earlier than start time.")
+            AlertManager.shared.showAlert(title: "Notice", message: "End time cannot be earlier than start time.")
             endTimeTextView.text = ""
             return
         }
@@ -215,7 +202,7 @@ class AppointmentFormViewController: UIViewController {
     }
 
     @objc private func showConflictAlert() {
-        Utilities.shared.showAlert(title: "Notice",message: "This employee already has an appointment during this time.")
+        AlertManager.shared.showAlert(title: "Notice",message: "This employee already has an appointment during this time.")
     }
 
     // MARK: - Validation
@@ -232,7 +219,7 @@ class AppointmentFormViewController: UIViewController {
                 let success = await viewModel.createAppointment()
                 if success {
                     await MainActor.run {
-                        Utilities.shared.showAlert(title: "Success", message: "Appointment added successfully.") {
+                        AlertManager.shared.showAlert(title: "Success", message: "Appointment added successfully.") {
                             self.delegate?.didAddAppointment()
                             self.dismiss(animated: true)
                         }
@@ -246,13 +233,13 @@ class AppointmentFormViewController: UIViewController {
             let success = await viewModel.updateAppointment(existingAppointment: existingAppointment)
             if success {
                 await MainActor.run {
-                    Utilities.shared.showAlert(title: "Success", message: "Appointment updated successfully.") {
+                    AlertManager.shared.showAlert(title: "Success", message: "Appointment updated successfully.") {
                         self.delegate?.didAddAppointment()
                         self.dismiss(animated: true)
                     }
                 }
             } else {
-                Utilities.shared.showAlert(title: "Error", message: "Error while updating appointment")
+                AlertManager.shared.showAlert(title: "Error", message: "Error while updating appointment")
             }
         }
     }
@@ -296,7 +283,7 @@ extension AppointmentFormViewController: UITextFieldDelegate {
             let currentText = (textField.text ?? "") as NSString
             let updatedText = currentText.replacingCharacters(in: range, with: string)
             
-            viewModel.clientName = updatedText  // ✅ live update to ViewModel
+            viewModel.clientName = updatedText
 
             if updatedText.isEmpty {
                 clientNameErrorLabel.isHidden = true
@@ -359,12 +346,7 @@ extension AppointmentFormViewController: UIPickerViewDelegate, UIPickerViewDataS
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         viewModel.selectEmployee(at: row)
         selectEmployeeTextView.text = viewModel.selectedEmployeeName
-        
-        Task {
-            await viewModel.loadServicesForSelectedEmployee()
-            selectServicesTextView.text = ""
-        }
-
+        selectServicesTextView.text = ""
         employeePickerView.isHidden = true
         selectEmployeeTextView.isHidden = false
         selectEmployeeTextView.resignFirstResponder()
@@ -375,7 +357,7 @@ extension AppointmentFormViewController: ApointmentFormViewModlDelegate {
     
     func didFailWithError(_ error: any Error) {
         DispatchQueue.main.async {
-            Utilities.shared.showAlert(title:"Error",message: "\(error.localizedDescription)")
+            AlertManager.shared.showAlert(title:"Error",message: "\(error.localizedDescription)")
         }
     }
 }

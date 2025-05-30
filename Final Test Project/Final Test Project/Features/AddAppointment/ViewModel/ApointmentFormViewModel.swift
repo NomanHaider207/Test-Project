@@ -7,9 +7,17 @@
 
 import Foundation
 
+// MARK: - Enums
+enum AppointmentFormMode {
+    case add
+    case edit(existingAppointment: Appointments)
+}
+
+// MARK: - Delegate Protocol
 protocol ApointmentFormViewModlDelegate: AnyObject {
     func didFailWithError(_ error: Error)
 }
+
 // MARK: - AddAppointmentViewModel
 @MainActor
 class AppointmentFormViewModel {
@@ -26,9 +34,14 @@ class AppointmentFormViewModel {
     var clientName: String = ""
     var employees: [Employees] = []
     var selectedEmployeeId: UUID? = nil
+    var mode: AppointmentFormMode
     
     // MARK: - Init
-    init(networkManager: RepositoryManager) {
+    init(networkManager: RepositoryManager, mode: AppointmentFormMode) {
+        self.mode = mode
+        if case .edit(let appointment) = mode {
+                populateDataForEditing(with: appointment)
+        }
         self.networkManager = networkManager
     }
     
@@ -51,6 +64,20 @@ class AppointmentFormViewModel {
         return selectedServices.map { $0.title! }.joined(separator: ", ")
     }
     
+    var screenTitle: String {
+        switch mode {
+        case .add: return "Add Appointment"
+        case .edit: return "Update Appointment"
+        }
+    }
+
+    var buttonTitle: String {
+        switch mode {
+        case .add: return "Create"
+        case .edit: return "Save"
+        }
+    }
+    
     // MARK: - Public Methods
     func loadEmployees() async {
         let result = await networkManager?.getEmployees()
@@ -69,6 +96,9 @@ class AppointmentFormViewModel {
     func selectEmployee(at index: Int) {
         selectedEmployee = employees[index]
         selectedEmployeeId = selectedEmployee?.id
+        Task{
+            await loadServicesForSelectedEmployee()
+        }
         selectedServices = []
     }
     

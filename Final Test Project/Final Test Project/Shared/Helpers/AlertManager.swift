@@ -1,8 +1,8 @@
 import UIKit
 
-class Utilities {
+class AlertManager {
 
-    static let shared = Utilities()
+    static let shared = AlertManager()
 
     func showAlert(title: String, message: String, completion: (() -> Void)? = nil) {
         DispatchQueue.main.async {
