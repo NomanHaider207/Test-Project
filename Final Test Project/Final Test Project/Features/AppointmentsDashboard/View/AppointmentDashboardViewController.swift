@@ -19,11 +19,9 @@ class AppoinmentDashboardViewController: UIViewController {
     // MARK: - Lifecycle Methods
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         setupUI()
         loadData()
     }
-    
     
     // MARK: - Actions
     @IBAction func onDateChange(_ sender: UIDatePicker) {
@@ -44,14 +42,18 @@ class AppoinmentDashboardViewController: UIViewController {
     
     private func loadData() {
         Task {
-            //await viewModel.creatDummyData()
-            await viewModel.loadEmployees()
-            await viewModel.loadAppointments()
             
+            async let employeesTask: () = viewModel.loadEmployees()
+            async let appointmentsTask: () = viewModel.loadAppointments()
+
+            await employeesTask
+            await appointmentsTask
+
             tableView.reloadData()
             collectionView.reloadData()
         }
     }
+
     
     // MARK: - Navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {

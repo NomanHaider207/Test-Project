@@ -201,13 +201,13 @@
 			path = Model;
 			sourceTree = "<group>";
 		};
-		D736F2F72DE875AE003A77C6 /* Core */ = {
+		D736F2F72DE875AE003A77C6 /* CoreData */ = {
 			isa = PBXGroup;
 			children = (
 				D7B548F42DCBDF190094BA51 /* Final_Test_Project.xcdatamodeld */,
 				D72F953A2DE6401100475484 /* CoreDataManager.swift */,
 			);
-			path = Core;
+			path = CoreData;
 			sourceTree = "<group>";
 		};
 		D736F2F82DE875DD003A77C6 /* Domain */ = {
@@ -372,7 +372,7 @@
 			isa = PBXGroup;
 			children = (
 				D736F2F82DE875DD003A77C6 /* Domain */,
-				D736F2F72DE875AE003A77C6 /* Core */,
+				D736F2F72DE875AE003A77C6 /* CoreData */,
 				D76E1B272DE6310C006265C1 /* Features */,
 				D72531FC2DCCFBBB0048E613 /* Utilities */,
 				D76F10E42DD528D500D87AB7 /* AssetsResource */,
